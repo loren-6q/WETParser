@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wild & Wandering Tools v5.1</title>
+    <!-- Custom Hardcoded Favicon mimicking the requested image with a 'W' -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'JetBrains Mono', monospace; }
+        .font-sans-bold { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight: 700; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        input:focus, textarea:focus { font-size: 16px !important; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="bg-slate-100 p-2 min-h-screen">
+    <div id="root" class="max-w-4xl mx-auto flex flex-col gap-2">
+        <!-- Header -->
+        <div class="flex items-center justify-between bg-white border border-slate-300 px-3 py-2 rounded shadow-sm">
+            <div class="flex items-center gap-2">
+                <span id="header-icon">📄</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-lg uppercase">Wild & Wandering Tools 5.1</span>
+            </div>
+            <div class="flex gap-2">
+                <div id="view-toggle-container" class="flex bg-slate-100 rounded p-1">
+                    <button onclick="setViewMode('fields')" id="btn-fields" class="p-1.5 rounded bg-white shadow-sm text-blue-600" title="Field View">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    </button>
+                    <button onclick="setViewMode('block')" id="btn-block" class="p-1.5 rounded text-slate-400" title="Summary View">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </button>
+                    <button onclick="setViewMode('reply')" id="btn-reply" class="p-1.5 rounded text-slate-400" title="Reply Generator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </button>
+                </div>
+                <button onclick="clearInput()" class="px-2 py-1 text-slate-400 hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-2 h-[calc(100vh-85px)]">
+            <!-- Input Area -->
+            <textarea id="input-area" oninput="handleInput()" 
+                class="h-full p-4 border border-slate-300 rounded shadow-inner focus:outline-none bg-white resize-none text-[15px] leading-tight font-sans" 
+                placeholder="PASTE BOOKING, CARD, OR INQUIRY DATA..."></textarea>
+
+            <!-- Output Area -->
+            <div id="output-container" class="h-full overflow-hidden bg-white border border-slate-300 rounded flex flex-col relative">
+                <div id="empty-state" class="flex-1 flex flex-col items-center justify-center text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <p class="mt-2 font-black text-sm tracking-widest uppercase opacity-40">Ready for Paste</p>
+                </div>
+                <div id="results-view" class="hidden flex-1 flex flex-col p-2 gap-1.5 overflow-y-auto custom-scrollbar">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let viewMode = 'fields';
+        let lastParsedData = null;
+        
+        let quoteState = {
+            guestName: 'Guest', guests: 2, nights: 2, budget: 0, standard: 0, superior: 0, female: 0,
+            exBudgetBed: 199, exStandBed: 250, exSuperBed: 299, exFemBed: 199,
+            exBudgetPriv: 1599, exStandPriv: 1999, exSuperPriv: 2399, exFemPriv: 1599,
+            extraNightsOpen: false
+        };
+
+        function handleInput() {
+            const val = document.getElementById('input-area').value;
+            if (!val.trim()) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('results-view').classList.add('hidden');
+                return;
+            }
+            lastParsedData = parseData(val);
+            if (lastParsedData) {
+                quoteState.guestName = lastParsedData.firstName || 'Guest';
+                quoteState.guests = lastParsedData.guestCount || 2;
+                quoteState.nights = lastParsedData.nights || 2;
+            }
+            renderResults();
+        }
+
+        function clearInput() {
+            document.getElementById('input-area').value = '';
+            handleInput();
+        }
+
+        function setViewMode(mode) {
+            viewMode = mode;
+            ['btn-fields', 'btn-block', 'btn-reply'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const isMatch = id === 'btn-' + mode;
+                el.classList.toggle('text-blue-600', isMatch);
+                el.classList.toggle('bg-white', isMatch);
+                el.classList.toggle('shadow-sm', isMatch);
+                el.classList.toggle('text-slate-400', !isMatch);
+            });
+            renderResults();
+        }
+
+        function parseData(text) {
+            const cleanText = text.replace(/[\u202a\u202b\u202c\u202d\u202e]/g, "");
+            const isBookingCom = /booking\.com|Commissionable\s+amount/i.test(cleanText);
+            const isCreditCard = !isBookingCom && (/\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}/.test(cleanText) || /cvv|cv2/i.test(cleanText) || /name\s*on\s*card/i.test(cleanText));
+            return isBookingCom ? parseBookingCom(cleanText) : (isCreditCard ? parseCardData(cleanText) : parseAirbnb(cleanText));
+        }
+
+        function parseCardData(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const labels = ['card type', 'card number', 'expires', 'cvv (cv2)', 'cvv', 'cv2', 'name on card', 'company', 'first name', 'last name', 'nationality', 'address line 1', 'gender', 'birthday', 'age', 'address line 2', 'zip', 'city', 'state/ region', 'state / region', 'passport id', 'email', 'phone', 'visa', 'mastercard', 'card holder'];
+            const email = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "";
+            const cardNumber = text.replace(/[\s-]/g, '').match(/\d{13,19}/)?.[0] || "";
+            const expiryMatch = text.match(/(\d{1,2}\/\d{2,4})/);
+            let expiry = expiryMatch ? expiryMatch[0] : "";
+            if (expiry.includes('/20')) {
+                const parts = expiry.split('/');
+                expiry = `${parts[0].padStart(2, '0')}/${parts[1].substring(2)}`;
+            }
+            const cvv = (text.match(/\b\d{3}\b/g) || []).find(num => !expiry.startsWith(num) && !cardNumber.startsWith(num)) || "";
+            const zip = lines.find(l => /^\d{4,6}$/.test(l) && l !== cvv && !expiry.includes(l) && !/^20\d{2}$/.test(l)) || "";
+            const name = lines.find(l => !/\d/.test(l) && l.length > 3 && !['visa', 'mastercard', 'cvv', 'cv2', 'expires', 'card type'].some(lbl => l.toLowerCase().includes(lbl))) || "Unknown Cardholder";
+            return { type: 'card', block: `${name}\n${cardNumber} ${expiry} ${cvv}\n${[email, zip].filter(x => x).join(' ')}`.trim(), firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' ') };
+        }
+
+        function parseBookingCom(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const findLabel = (lbl) => {
+                const idx = lines.findIndex(l => l.toLowerCase().includes(lbl.toLowerCase()));
+                return idx !== -1 ? lines[idx + 1] : "";
+            };
+            const name = findLabel('Guest name:');
+            const commAmtRaw = findLabel('Commissionable amount:').replace(/[^\d.]/g, '') || "0";
+            const commChargesRaw = findLabel('Commission and charges:').replace(/[^\d.]/g, '') || "0";
+            const netPrice = (parseFloat(commAmtRaw) - parseFloat(commChargesRaw) || 0).toFixed(2);
+            
+            const otherDetails = `
+${name}
+${text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "---"}
+${text.match(/\+[\d\s-]{9,20}/)?.[0] || "---"}
+TOTAL PRICE: ${commAmtRaw}
+FEE: ${commChargesRaw}
+NET PRICE: ${netPrice}
+Check-in: ${findLabel('Check-in')}
+Check-out: ${findLabel('Check-out')}
+BOOKED: ${findLabel('Received')}
+${findLabel('Booking number:')}
+${findLabel('Channel:') || "---"}
+            `.trim();
+
+            return { 
+                type: 'booking', firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' '), 
+                email: text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "",
+                phone: text.match(/\+[\d\s-]{9,20}/)?.[0] || "",
+                totalPrice: `THB ${commAmtRaw}`, commission: `THB ${commChargesRaw}`, payout: `THB ${netPrice}`, guestCount: parseInt(findLabel('Total guests:')) || 2, nights: parseInt(findLabel('Length of stay:')) || 1,
+                otherDetails, city: "", country: ""
+            };
+        }
+
+        function parseAirbnb(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const findPattern = (regex) => { const match = text.match(regex); return match ? (match[1] || match[0]).trim() : null; };
+
+            let fullName = lines[0];
+            if (fullName.includes('·') || fullName.includes('OVERALL')) {
+                fullName = findPattern(/About\s+([A-Z][a-zà-ÿ]+\s+[A-Z][a-zà-ÿ]+)/i) || lines[0];
+            }
+            const nameParts = fullName.split(' ');
+            const firstName = nameParts[0] || "";
+            const lastName = nameParts.slice(1).join(' ') || "";
+
+            const guests = parseInt(findPattern(/(\d+)\s+guests?/i)) || 1;
+            const nightsMatch = text.match(/(\d+)\s+nights/i);
+            const nights = nightsMatch ? parseInt(nightsMatch[1]) : 1;
+            const dates = findPattern(/([A-Z][a-z]{2}\s\d{1,2}.*\(.*nights?\))/i) || lines.find(l => l.includes('–') && /\d/.test(l)) || "";
+
+            const locationLine = findPattern(/Lives\s+in\s+([^.\n]+)/i);
+            let city = "", country = "";
+            if (locationLine) {
+                const parts = locationLine.split(',').map(p => p.trim());
+                if (parts.length >= 2) { city = parts[0]; country = parts[parts.length - 1]; }
+                else { country = parts[0]; }
+            }
+
+            const phoneMatch = text.match(/Phone:?\s*(?:‪)?(\+?[\d\s-]{7,25})(?:‬)?/i);
+            const phone = phoneMatch ? phoneMatch[1].replace(/[\u202c\u202d\u202a]/g, '').trim() : "";
+            const email = findPattern(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/) || "";
+
+            const totalMatches = Array.from(text.matchAll(/Total\s+\(THB\)\s+฿?([\d,.]+)/gi));
+            const guestPaid = totalMatches[0] ? totalMatches[0][1] : "0";
+            const hostPayout = totalMatches.length > 1 ? totalMatches[totalMatches.length - 1][1] : guestPaid;
+            const serviceFee = findPattern(/Host\s+service\s+fee.*\s+[−-]?฿?([\d,.]+)/i) || "0";
+            const guestsPrice = findPattern(/(\d+\s+guest\s+·\s+฿[\d,.]+)/i) || "";
+            const bookingDate = findPattern(/Booking\s+date\s+(.*)/i) || "";
+            const confCode = findPattern(/Confirmation\s+code\s+([A-Z0-9]+)/i);
+            const policy = findPattern(/Cancellation\s+policy\s+(.*)/i);
+            const listingName = lines.find((l, i) => i > 0 && i < 6 && (l.includes('·') || l.includes('Style') || l.includes('OVERALL')));
+
+            const otherDetails = `
+${firstName} ${lastName}
+${city || "---"}, ${country || "---"}
+${phone || "---"}
+TOTAL PRICE: ${guestPaid.replace(/,/g, '')}
+FEE: ${serviceFee.replace(/[^\d.]/g, '')}
+NET PRICE: ${hostPayout.replace(/,/g, '')}
+${dates}
+${guestsPrice}
+BOOKED: ${bookingDate}
+${confCode || "---"}
+CANCELLATION: ${policy || "---"}
+${listingName || "---"}
+            `.trim();
+
+            return { 
+                type: 'airbnb', firstName, lastName, city, country, email, phone, 
+                totalPrice: `฿${guestPaid}`, commission: `฿${serviceFee}`, payout: `฿${hostPayout}`, guestCount: guests, nights: nights,
+                otherDetails, listingName 
+            };
+        }
+
+        function updateQuote(field, val) {
+            quoteState[field] = field === 'guestName' ? val : (parseFloat(val) || 0);
+            const textarea = document.getElementById('reply-text');
+            if (textarea) textarea.value = generateReplyString();
+        }
+
+        function renderResults() {
+            const view = document.getElementById('results-view');
+            const empty = document.getElementById('empty-state');
+            const title = document.getElementById('app-title');
+            if (!lastParsedData && viewMode !== 'reply') { view.classList.add('hidden'); empty.classList.remove('hidden'); title.innerText = "Wild & Wandering Tools 5.1"; return; }
+            view.classList.remove('hidden'); empty.classList.add('hidden');
+            if (viewMode === 'reply') { title.innerText = "Reply Generator"; renderReplyView(view); }
+            else if (lastParsedData && lastParsedData.type === 'card') { title.innerText = "Card Secure-Parse"; renderCardView(view); }
+            else if (lastParsedData) {
+                title.innerText = lastParsedData.type === 'booking' ? "Booking.com Parser" : "Airbnb Parser";
+                if (viewMode === 'block') renderBlockView(view); else renderFieldsView(view);
+            }
+        }
+
+        function renderCardView(el) {
+            el.innerHTML = `<div class="p-3 flex flex-col gap-3"><div class="bg-red-50 border border-red-200 p-6 rounded text-center shadow-sm"><pre class="text-[20px] font-bold text-slate-900 whitespace-pre-wrap font-sans text-left">${lastParsedData.block}</pre></div><button onclick="copyToClipboard(lastParsedData.block, 'CARD')" id="status-CARD" class="w-full py-6 bg-red-600 text-white font-black rounded shadow-lg hover:bg-red-700 text-lg uppercase">COPY BLOCK</button></div>`;
+        }
+
+        function generateReplyString() {
+            const f = (num) => new Intl.NumberFormat().format(num);
+            const s = (count, single, plural) => parseInt(count) === 1 ? single : plural;
+            const { guestName, guests: g, nights: n, budget: b, standard: sRate, superior: sup, female: fem, exBudgetBed, exStandBed, exSuperBed, exFemBed, exBudgetPriv, exStandPriv, exSuperPriv, exFemPriv } = quoteState;
+            const privateCalc = (price, cap) => {
+                if (!price) return "0";
+                if (cap === 4) { if (g === 4) return f(4 * price); if (g < 4) return f(Math.round(3.9 * price)); if (g === 6) return f(6 * price); if (g < 6) return f(Math.round(5.75 * price)); if (g === 8) return f(8 * price); if (g < 8) return f(Math.round(7.75 * price)); }
+                if (cap === 6) { if (g === 6) return f(6 * price); if (g < 6) return f(Math.round(5.75 * price)); if (g === 8) return f(8 * price); if (g < 8) return f(Math.round(7.75 * price)); }
+                if (cap === 8) { if (g === 8) return f(8 * price); if (g < 8) return f(Math.round(7.75 * price)); }
+                return "N/A";
+            };
+            const introLine = `Hi ${guestName}! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are currently available.`;
+            const staticInfo = `฿🇹🇭 All prices are in Thai baht for the total stay. Dorm prices are per person, and private room prices are for the whole room.
+
+⛔ AirBnB can't calculate more than one bed or handle groups, upgrades, or special requests, so we do our best to quote full details you can find about WETPoolParty.
+
+--------------------
+💦Our Pool Party hostel is a 3-minute walk from Full Moon Party beach and has a private fenced compound featuring a garden area and a large pool with a swim-up bar, raised DJ booth, games, and more. A great place to hang out and party, with chillouts and special events and parties. We have all dorms:
+
+* 💲BUDGET dorm - 4-10 beds, aircon, shared bathroom, louder area.
+* 🚺FEMALE-only dorm - 8 beds, aircon, ensuite bathrooms, quieter area.
+* 🚻STANDARD dorm - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.
+* 🛅SUPERIOR dorm - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
+
+--------------------
+🛌POOL HOSTEL BEDS:
+BUDGET Dorm: ${b} baht - ${f(g * b)} total, extra nights are ${exBudgetBed} baht per person per night. 
+STANDARD Dorm: ${sRate} baht - ${f(g * sRate)} total, extra nights ${exStandBed} baht per person per night.
+SUPERIOR Dorm: ${sup} baht - ${f(g * sup)} total, extra nights ${exSuperBed} baht per person per night.
+FEMALE Dorm: ${fem} baht - ${f(g * fem)} total, extra nights ${exFemBed} baht per person per night.
+
+
+🏩POOL HOSTEL DORMS FOR PRIVATE USE:
+BUDGET Dorm: ${privateCalc(b, 4)} baht, extra nights ${exBudgetPriv} baht per night.
+STANDARD Dorm: ${privateCalc(sRate, 6)} baht, extra nights ${exStandPriv} baht per night.
+SUPERIOR Dorm: ${privateCalc(sup, 6)} baht, extra nights ${exSuperPriv} baht per night.
+FEMALE Dorm: ${privateCalc(fem, 8)} baht, extra nights ${exFemPriv} baht per night.
+
+
+--------------------
+🚨Please let us know ASAP if you would like us to book one of these options as we usually sell out quickly!`;
+            const moonWarning = `📢Many people don't realize that 🌕FULL MOON PARTY🌕 is a weeklong event with at least FIVE nights of all-night parties. Our pool party hostel hosts preparties every day from 2 days before Full Moon night to 2 days after and the pool & bar are open 24 hours during Full Moon week.
+
+🔗Check out @FullMoonWeek on IG for an idea of all the parties!
+
+🎉The usual line-up (not including many other parties with changing dates like OXA Party (Fridays), Eden, Seaside & Hollystone (Saturdays), Bambu & Sinewave DnB at ChillUp (Sundays) Monday Madness at ChillUp, Big Splash DnB (Tuesdays), Lighthouse & Psyday at ChillUp (Tuesdays & Fridays), Retro Mountain, Chill Up, Stona, etc.) is:
+
+2⃣ DAYS BEFORE: Waterfall Party, Utopia, 5-day WET Pool Party preparty
+1⃣ DAY BEFORE: Jungle Experience, WET preparty
+🌕FULL MOON PARTY🌕 24 hours
+1⃣ DAY AFTER: WET FOAM Party
+2⃣ DAYS AFTER: Waterfall Party, WET preparty
+
+🚨If you're not booking for at least 3 or 4 of the 5-day event, we HIGHLY recommend you extend. We offer super-cheap extension rates. Just let us know!`;
+            return `${introLine}\n\n${staticInfo}\n\n${n < 3 ? moonWarning : '😍'}`;
+        }
+
+        function renderReplyView(el) {
+            const { guestName, guests, nights, budget, standard, superior, female, exBudgetBed, exStandBed, exSuperBed, exFemBed, exBudgetPriv, exStandPriv, exSuperPriv, exFemPriv, extraNightsOpen } = quoteState;
+            const reply = generateReplyString();
+            el.innerHTML = `
+                <div class="flex-1 p-2 flex flex-col gap-2">
+                    <div class="bg-indigo-50 border border-indigo-200 p-3 rounded shadow-sm space-y-3">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Guest Name</label><input type="text" onchange="updateQuote('guestName', this.value)" value="${guestName}" class="p-2 border rounded font-bold text-sm"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Guests</label><input type="number" onchange="updateQuote('guests', this.value)" value="${guests}" class="p-2 border rounded font-bold text-sm"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Nights</label><input type="number" onchange="updateQuote('nights', this.value)" value="${nights}" class="p-2 border rounded font-bold text-sm"></div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Budget Rate</label><input type="number" onchange="updateQuote('budget', this.value)" value="${budget||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Standard</label><input type="number" onchange="updateQuote('standard', this.value)" value="${standard||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Superior</label><input type="number" onchange="updateQuote('superior', this.value)" value="${superior||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Female</label><input type="number" onchange="updateQuote('female', this.value)" value="${female||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
+                        </div>
+                        <details class="group" ${extraNightsOpen ? 'open' : ''} ontoggle="quoteState.extraNightsOpen = this.open">
+                            <summary class="text-[10px] font-bold text-indigo-600 cursor-pointer uppercase tracking-tighter">Edit Extra Night Rates ↓</summary>
+                            <div class="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-indigo-200">
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Bed Bud</label><input type="number" onchange="updateQuote('exBudgetBed', this.value)" value="${exBudgetBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Bed Std</label><input type="number" onchange="updateQuote('exStandBed', this.value)" value="${exStandBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Bed Sup</label><input type="number" onchange="updateQuote('exSuperBed', this.value)" value="${exSuperBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Bed Fem</label><input type="number" onchange="updateQuote('exFemBed', this.value)" value="${exFemBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Priv Bud</label><input type="number" onchange="updateQuote('exBudgetPriv', this.value)" value="${exBudgetPriv}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Priv Std</label><input type="number" onchange="updateQuote('exStandPriv', this.value)" value="${exStandPriv}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Priv Sup</label><input type="number" onchange="updateQuote('exSuperPriv', this.value)" value="${exSuperPriv}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-bold opacity-50 uppercase">Ex Priv Fem</label><input type="number" onchange="updateQuote('exFemPriv', this.value)" value="${exFemPriv}" class="p-1 border rounded text-[10px]"></div>
+                            </div>
+                        </details>
+                    </div>
+                    <textarea id="reply-text" class="flex-1 min-h-[300px] w-full p-4 bg-white border border-slate-300 rounded font-sans text-[13px] leading-snug focus:outline-none custom-scrollbar" spellcheck="false">${reply}</textarea>
+                    <button onclick="copyToClipboard(document.getElementById('reply-text').value, 'REPLY')" id="status-REPLY" class="w-full py-4 bg-indigo-600 text-white font-black rounded shadow-lg text-lg uppercase flex items-center justify-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>COPY REPLY</button>
+                </div>
+            `;
+        }
+
+        function renderBlockView(el) {
+            const fullText = `${lastParsedData.firstName} ${lastParsedData.lastName}\n${lastParsedData.phone}\n${lastParsedData.email}\n\nTOTAL: ${lastParsedData.totalPrice}\nPAYOUT: ${lastParsedData.payout}\n\n${lastParsedData.otherDetails}`;
+            el.innerHTML = `<div class="h-full flex flex-col p-1"><pre class="flex-1 p-4 bg-slate-50 border border-slate-300 rounded text-[16px] leading-relaxed overflow-auto font-sans font-bold text-slate-800 text-left">${fullText}</pre><button onclick="copyToClipboard(\`${fullText}\`, 'FULL')" id="status-FULL" class="mt-2 w-full py-4 bg-blue-600 text-white font-black rounded hover:bg-blue-700 uppercase text-sm shadow-md">COPY FULL SUMMARY</button></div>`;
+        }
+
+        function renderFieldsView(el) {
+            el.innerHTML = `<div class="flex-1 flex flex-col p-2 gap-1.5 overflow-y-auto">
+                <div class="grid grid-cols-2 gap-1.5">
+                    <div onclick="copyToClipboard(lastParsedData.firstName, 'FNAME')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-FNAME">FIRST NAME</span>
+                        <span class="text-[16px] font-bold font-sans-bold">${lastParsedData.firstName || '---'}</span>
+                    </div>
+                    <div onclick="copyToClipboard(lastParsedData.lastName, 'LNAME')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-LNAME">LAST NAME</span>
+                        <span class="text-[16px] font-bold font-sans-bold">${lastParsedData.lastName || '---'}</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-1.5">
+                    <div onclick="copyToClipboard(lastParsedData.city, 'CITY')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-CITY">CITY</span>
+                        <span class="text-[16px] font-bold font-sans-bold">${lastParsedData.city || '---'}</span>
+                    </div>
+                    <div onclick="copyToClipboard(lastParsedData.country, 'COUNTRY')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-COUNTRY">COUNTRY</span>
+                        <span class="text-[16px] font-bold font-sans-bold">${lastParsedData.country || '---'}</span>
+                    </div>
+                </div>
+
+                <div onclick="copyToClipboard(lastParsedData.email, 'EMAIL')" class="bg-white border border-slate-300 p-2 rounded shadow-sm cursor-pointer"><span class="text-[10px] text-slate-400 block uppercase" id="status-EMAIL">EMAIL</span><span class="text-[16px] font-bold font-sans-bold">${lastParsedData.email || '---'}</span></div>
+                <div onclick="copyToClipboard(lastParsedData.phone, 'PHONE')" class="bg-white border border-slate-300 p-2 rounded shadow-sm cursor-pointer"><span class="text-[10px] text-slate-400 block uppercase" id="status-PHONE">PHONE</span><span class="text-[16px] font-bold font-sans-bold">${lastParsedData.phone || '---'}</span></div>
+                
+                <div class="mt-1 p-2 bg-blue-50 border border-blue-200 rounded space-y-1.5 shadow-sm">
+                    <div onclick="copyToClipboard(lastParsedData.totalPrice, 'TOTAL')" class="flex justify-between items-center cursor-pointer border-b border-blue-100 pb-1">
+                        <span class="text-[10px] font-black text-blue-400">TOTAL PRICE</span>
+                        <span class="text-[16px] font-bold font-sans-bold">${lastParsedData.totalPrice}</span>
+                    </div>
+                    <div onclick="copyToClipboard(lastParsedData.commission, 'FEE_VAL')" class="flex justify-between items-center cursor-pointer border-b border-blue-100 pb-1">
+                        <span class="text-[10px] font-black text-blue-400 uppercase">Fee</span>
+                        <span class="text-[16px] font-bold font-sans-bold">${lastParsedData.commission || '฿0'}</span>
+                    </div>
+                    <div onclick="copyToClipboard(lastParsedData.payout, 'PAYOUT')" class="flex justify-between items-center cursor-pointer pt-0.5">
+                        <span class="text-[10px] font-black text-blue-600 uppercase">Net Payout</span>
+                        <span class="text-[18px] font-black text-blue-700 font-sans-bold">${lastParsedData.payout}</span>
+                    </div>
+                </div>
+                
+                <div class="mt-auto pt-2">
+                    <div class="flex justify-between items-center bg-slate-200 px-3 py-1.5 rounded-t border-x border-t border-slate-300"><span class="font-black text-[10px] text-slate-500 uppercase tracking-widest">NOTES BLOCK</span><button onclick="copyToClipboard(lastParsedData.otherDetails, 'OTHER')" id="status-OTHER" class="px-3 py-1 rounded font-black text-[10px] bg-slate-400 text-white uppercase">COPY</button></div>
+                    <pre class="bg-white border border-slate-300 p-3 rounded-b text-[16px] whitespace-pre-wrap leading-tight font-sans text-slate-700 font-bold text-left">${lastParsedData.otherDetails}</pre>
+                </div>
+            </div>`;
+        }
+
+        function copyToClipboard(text, id) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text; document.body.appendChild(textArea); textArea.select();
+            try { document.execCommand('copy'); showCopiedFeedback(id); } catch (err) {}
+            document.body.removeChild(textArea);
+        }
+
+        function showCopiedFeedback(id) {
+            const el = document.getElementById(`status-${id}`);
+            if (el) { const original = el.innerText; el.innerText = 'COPIED'; el.classList.replace('text-slate-400', 'text-green-600'); setTimeout(() => { el.innerText = original; el.classList.replace('text-green-600', 'text-slate-400'); }, 1500); }
+        }
+    </script>
+    <script src="https://loren-6q.github.io/WETNav/nav.js"></script>
+
+</body>
+</html>
