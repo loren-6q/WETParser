@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wild & Wandering Tools v5.1</title>
+    <title>Wild & Wandering Tools v5.3</title>
     <!-- Custom Hardcoded Favicon mimicking the requested image with a 'W' -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,8 +23,8 @@
         <!-- Header -->
         <div class="flex items-center justify-between bg-white border border-slate-300 px-3 py-2 rounded shadow-sm">
             <div class="flex items-center gap-2">
-                <span id="header-icon">📄</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-lg uppercase">WET Parsing Tool</span>
+                <span id="header-icon">🚀</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-lg uppercase">Wild & Wandering Tools 5.3</span>
             </div>
             <div class="flex gap-2">
                 <div id="view-toggle-container" class="flex bg-slate-100 rounded p-1">
@@ -71,8 +71,34 @@
             guestName: 'Guest', guests: 2, nights: 2, budget: 0, standard: 0, superior: 0, female: 0,
             exBudgetBed: 199, exStandBed: 250, exSuperBed: 299, exFemBed: 199,
             exBudgetPriv: 1599, exStandPriv: 1999, exSuperPriv: 2399, exFemPriv: 1599,
-            extraNightsOpen: false
+            extraNightsOpen: false,
+            checkinISO: '',
+            checkoutISO: ''
         };
+
+        // Improved ISO Date Converter (Handles "Tue, Mar 17, 2026")
+        function convertToISO(dateStr) {
+            if (!dateStr || dateStr.length < 5) return '';
+            const months = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
+            const match = dateStr.match(/([A-Z][a-z]{2})\s(\d{1,2}),\s(\d{4})/i);
+            if (match) {
+                const m = months[match[1]];
+                const d = match[2].padStart(2, '0');
+                const y = match[3];
+                return `${y}-${m}-${d}`;
+            }
+            return '';
+        }
+
+        // Helper to find data after a label even if on the next line
+        function findLabelValue(lines, label) {
+            const idx = lines.findIndex(l => l.toLowerCase().includes(label.toLowerCase()));
+            if (idx === -1) return "";
+            const currentLine = lines[idx].replace(new RegExp(label, 'i'), '').trim();
+            if (currentLine.length > 2) return currentLine; // Date is on same line
+            if (lines[idx + 1]) return lines[idx + 1]; // Date is on next line
+            return "";
+        }
 
         function handleInput() {
             const val = document.getElementById('input-area').value;
@@ -86,6 +112,8 @@
                 quoteState.guestName = lastParsedData.firstName || 'Guest';
                 quoteState.guests = lastParsedData.guestCount || 2;
                 quoteState.nights = lastParsedData.nights || 2;
+                quoteState.checkinISO = lastParsedData.checkinISO || '';
+                quoteState.checkoutISO = lastParsedData.checkoutISO || '';
             }
             renderResults();
         }
@@ -118,7 +146,6 @@
 
         function parseCardData(text) {
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            const labels = ['card type', 'card number', 'expires', 'cvv (cv2)', 'cvv', 'cv2', 'name on card', 'company', 'first name', 'last name', 'nationality', 'address line 1', 'gender', 'birthday', 'age', 'address line 2', 'zip', 'city', 'state/ region', 'state / region', 'passport id', 'email', 'phone', 'visa', 'mastercard', 'card holder'];
             const email = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "";
             const cardNumber = text.replace(/[\s-]/g, '').match(/\d{13,19}/)?.[0] || "";
             const expiryMatch = text.match(/(\d{1,2}\/\d{2,4})/);
@@ -135,15 +162,14 @@
 
         function parseBookingCom(text) {
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            const findLabel = (lbl) => {
-                const idx = lines.findIndex(l => l.toLowerCase().includes(lbl.toLowerCase()));
-                return idx !== -1 ? lines[idx + 1] : "";
-            };
-            const name = findLabel('Guest name:');
-            const commAmtRaw = findLabel('Commissionable amount:').replace(/[^\d.]/g, '') || "0";
-            const commChargesRaw = findLabel('Commission and charges:').replace(/[^\d.]/g, '') || "0";
+            const name = findLabelValue(lines, 'Guest name:');
+            const commAmtRaw = findLabelValue(lines, 'Commissionable amount:').replace(/[^\d.]/g, '') || "0";
+            const commChargesRaw = findLabelValue(lines, 'Commission and charges:').replace(/[^\d.]/g, '') || "0";
             const netPrice = (parseFloat(commAmtRaw) - parseFloat(commChargesRaw) || 0).toFixed(2);
             
+            const checkin = findLabelValue(lines, 'Check-in');
+            const checkout = findLabelValue(lines, 'Check-out');
+
             const otherDetails = `
 ${name}
 ${text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "---"}
@@ -151,18 +177,22 @@ ${text.match(/\+[\d\s-]{9,20}/)?.[0] || "---"}
 TOTAL PRICE: ${commAmtRaw}
 FEE: ${commChargesRaw}
 NET PRICE: ${netPrice}
-Check-in: ${findLabel('Check-in')}
-Check-out: ${findLabel('Check-out')}
-BOOKED: ${findLabel('Received')}
-${findLabel('Booking number:')}
-${findLabel('Channel:') || "---"}
+Check-in: ${checkin}
+Check-out: ${checkout}
+BOOKED: ${findLabelValue(lines, 'Received')}
+${findLabelValue(lines, 'Booking number:')}
+${findLabelValue(lines, 'Channel:') || "---"}
             `.trim();
 
             return { 
                 type: 'booking', firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' '), 
                 email: text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "",
                 phone: text.match(/\+[\d\s-]{9,20}/)?.[0] || "",
-                totalPrice: `THB ${commAmtRaw}`, commission: `THB ${commChargesRaw}`, payout: `THB ${netPrice}`, guestCount: parseInt(findLabel('Total guests:')) || 2, nights: parseInt(findLabel('Length of stay:')) || 1,
+                totalPrice: `THB ${commAmtRaw}`, commission: `THB ${commChargesRaw}`, payout: `THB ${netPrice}`, 
+                guestCount: parseInt(findLabelValue(lines, 'Total guests:')) || 2, 
+                nights: parseInt(findLabelValue(lines, 'Length of stay:')) || 1,
+                checkinISO: convertToISO(checkin),
+                checkoutISO: convertToISO(checkout),
                 otherDetails, city: "", country: ""
             };
         }
@@ -194,8 +224,7 @@ ${findLabel('Channel:') || "---"}
 
             const phoneMatch = text.match(/Phone:?\s*(?:‪)?(\+?[\d\s-]{7,25})(?:‬)?/i);
             const phone = phoneMatch ? phoneMatch[1].replace(/[\u202c\u202d\u202a]/g, '').trim() : "";
-            const email = findPattern(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/) || "";
-
+            
             const totalMatches = Array.from(text.matchAll(/Total\s+\(THB\)\s+฿?([\d,.]+)/gi));
             const guestPaid = totalMatches[0] ? totalMatches[0][1] : "0";
             const hostPayout = totalMatches.length > 1 ? totalMatches[totalMatches.length - 1][1] : guestPaid;
@@ -205,6 +234,9 @@ ${findLabel('Channel:') || "---"}
             const confCode = findPattern(/Confirmation\s+code\s+([A-Z0-9]+)/i);
             const policy = findPattern(/Cancellation\s+policy\s+(.*)/i);
             const listingName = lines.find((l, i) => i > 0 && i < 6 && (l.includes('·') || l.includes('Style') || l.includes('OVERALL')));
+
+            const airCheckin = findLabelValue(lines, 'Check-in');
+            const airCheckout = findLabelValue(lines, 'Checkout');
 
             const otherDetails = `
 ${firstName} ${lastName}
@@ -222,8 +254,11 @@ ${listingName || "---"}
             `.trim();
 
             return { 
-                type: 'airbnb', firstName, lastName, city, country, email, phone, 
-                totalPrice: `฿${guestPaid}`, commission: `฿${serviceFee}`, payout: `฿${hostPayout}`, guestCount: guests, nights: nights,
+                type: 'airbnb', firstName, lastName, city, country, email: findPattern(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/) || "", phone, 
+                totalPrice: `฿${guestPaid}`, commission: `฿${serviceFee}`, payout: `฿${hostPayout}`, 
+                guestCount: guests, nights: nights,
+                checkinISO: convertToISO(airCheckin),
+                checkoutISO: convertToISO(airCheckout),
                 otherDetails, listingName 
             };
         }
@@ -232,13 +267,28 @@ ${listingName || "---"}
             quoteState[field] = field === 'guestName' ? val : (parseFloat(val) || 0);
             const textarea = document.getElementById('reply-text');
             if (textarea) textarea.value = generateReplyString();
+            const linkArea = document.getElementById('booking-link-container');
+            if (linkArea) linkArea.innerHTML = generateBookingLinkHTML();
+        }
+
+        function generateBookingLinkHTML() {
+            if (!quoteState.checkinISO || !quoteState.checkoutISO) {
+                return `<div class="py-2 text-[10px] text-center text-slate-400 bg-slate-50 border border-dashed rounded opacity-60">No Dates Detected for Link</div>`;
+            }
+            const url = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${quoteState.checkinISO}&checkout=${quoteState.checkoutISO}&group_adults=${quoteState.guests}&group_children=0&hapos=1&no_rooms=1`;
+            return `
+                <a href="${url}" target="_blank" class="block w-full py-3 bg-blue-600 text-white text-center rounded shadow-sm font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx='11' cy='11' r='8'></circle><line x1='21' y1='21' x2='16.65' y2='16.65'></line></svg>
+                    WET Rates: ${quoteState.checkinISO} (${quoteState.nights}n)
+                </a>
+            `;
         }
 
         function renderResults() {
             const view = document.getElementById('results-view');
             const empty = document.getElementById('empty-state');
             const title = document.getElementById('app-title');
-            if (!lastParsedData && viewMode !== 'reply') { view.classList.add('hidden'); empty.classList.remove('hidden'); title.innerText = "Wild & Wandering Tools 5.1"; return; }
+            if (!lastParsedData && viewMode !== 'reply') { view.classList.add('hidden'); empty.classList.remove('hidden'); title.innerText = "Wild & Wandering Tools 5.3"; return; }
             view.classList.remove('hidden'); empty.classList.add('hidden');
             if (viewMode === 'reply') { title.innerText = "Reply Generator"; renderReplyView(view); }
             else if (lastParsedData && lastParsedData.type === 'card') { title.innerText = "Card Secure-Parse"; renderCardView(view); }
@@ -312,6 +362,8 @@ FEMALE Dorm: ${privateCalc(fem, 8)} baht, extra nights ${exFemPriv} baht per nig
         function renderReplyView(el) {
             const { guestName, guests, nights, budget, standard, superior, female, exBudgetBed, exStandBed, exSuperBed, exFemBed, exBudgetPriv, exStandPriv, exSuperPriv, exFemPriv, extraNightsOpen } = quoteState;
             const reply = generateReplyString();
+            const bookingLink = generateBookingLinkHTML();
+
             el.innerHTML = `
                 <div class="flex-1 p-2 flex flex-col gap-2">
                     <div class="bg-indigo-50 border border-indigo-200 p-3 rounded shadow-sm space-y-3">
@@ -320,12 +372,17 @@ FEMALE Dorm: ${privateCalc(fem, 8)} baht, extra nights ${exFemPriv} baht per nig
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Guests</label><input type="number" onchange="updateQuote('guests', this.value)" value="${guests}" class="p-2 border rounded font-bold text-sm"></div>
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Nights</label><input type="number" onchange="updateQuote('nights', this.value)" value="${nights}" class="p-2 border rounded font-bold text-sm"></div>
                         </div>
-                        <div class="grid grid-cols-4 gap-2">
+                        
+                        <!-- Dynamic Booking Link Container -->
+                        <div id="booking-link-container">${bookingLink}</div>
+
+                        <div class="grid grid-cols-4 gap-2 pt-1 border-t border-indigo-100">
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Budget Rate</label><input type="number" onchange="updateQuote('budget', this.value)" value="${budget||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Standard</label><input type="number" onchange="updateQuote('standard', this.value)" value="${standard||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Superior</label><input type="number" onchange="updateQuote('superior', this.value)" value="${superior||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase">Female</label><input type="number" onchange="updateQuote('female', this.value)" value="${female||''}" class="p-2 border rounded text-sm" placeholder="Price"></div>
                         </div>
+                        
                         <details class="group" ${extraNightsOpen ? 'open' : ''} ontoggle="quoteState.extraNightsOpen = this.open">
                             <summary class="text-[10px] font-bold text-indigo-600 cursor-pointer uppercase tracking-tighter">Edit Extra Night Rates ↓</summary>
                             <div class="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-indigo-200">
@@ -348,7 +405,7 @@ FEMALE Dorm: ${privateCalc(fem, 8)} baht, extra nights ${exFemPriv} baht per nig
 
         function renderBlockView(el) {
             const fullText = `${lastParsedData.firstName} ${lastParsedData.lastName}\n${lastParsedData.phone}\n${lastParsedData.email}\n\nTOTAL: ${lastParsedData.totalPrice}\nPAYOUT: ${lastParsedData.payout}\n\n${lastParsedData.otherDetails}`;
-            el.innerHTML = `<div class="h-full flex flex-col p-1"><pre class="flex-1 p-4 bg-slate-50 border border-slate-300 rounded text-[16px] leading-relaxed overflow-auto font-sans font-bold text-slate-800 text-left">${fullText}</pre><button onclick="copyToClipboard(\`${fullText}\`, 'FULL')" id="status-FULL" class="mt-2 w-full py-4 bg-blue-600 text-white font-black rounded hover:bg-blue-700 uppercase text-sm shadow-md">COPY FULL SUMMARY</button></div>`;
+            el.innerHTML = `<div class="h-full flex flex-col p-1"><pre class="flex-1 p-4 bg-slate-50 border border-slate-300 rounded text-[16px] leading-relaxed overflow-auto font-sans font-bold text-slate-800 text-left text-left">${fullText}</pre><button onclick="copyToClipboard(\`${fullText}\`, 'FULL')" id="status-FULL" class="mt-2 w-full py-4 bg-blue-600 text-white font-black rounded hover:bg-blue-700 uppercase text-sm shadow-md">COPY FULL SUMMARY</button></div>`;
         }
 
         function renderFieldsView(el) {
@@ -395,7 +452,7 @@ FEMALE Dorm: ${privateCalc(fem, 8)} baht, extra nights ${exFemPriv} baht per nig
                 
                 <div class="mt-auto pt-2">
                     <div class="flex justify-between items-center bg-slate-200 px-3 py-1.5 rounded-t border-x border-t border-slate-300"><span class="font-black text-[10px] text-slate-500 uppercase tracking-widest">NOTES BLOCK</span><button onclick="copyToClipboard(lastParsedData.otherDetails, 'OTHER')" id="status-OTHER" class="px-3 py-1 rounded font-black text-[10px] bg-slate-400 text-white uppercase">COPY</button></div>
-                    <pre class="bg-white border border-slate-300 p-3 rounded-b text-[16px] whitespace-pre-wrap leading-tight font-sans text-slate-700 font-bold text-left">${lastParsedData.otherDetails}</pre>
+                    <pre class="bg-white border border-slate-300 p-3 rounded-b text-[16px] whitespace-pre-wrap leading-tight font-sans text-slate-700 font-bold text-left text-left">${lastParsedData.otherDetails}</pre>
                 </div>
             </div>`;
         }
@@ -412,7 +469,7 @@ FEMALE Dorm: ${privateCalc(fem, 8)} baht, extra nights ${exFemPriv} baht per nig
             if (el) { const original = el.innerText; el.innerText = 'COPIED'; el.classList.replace('text-slate-400', 'text-green-600'); setTimeout(() => { el.innerText = original; el.classList.replace('text-green-600', 'text-slate-400'); }, 1500); }
         }
     </script>
-    <script src="https://loren-6q.github.io/WETNav/nav.js"></script>
+       <script src="https://loren-6q.github.io/WETNav/nav.js"></script>
 
 </body>
 </html>
