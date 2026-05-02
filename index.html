@@ -3,125 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WET Parser v6.1</title>
-    <!-- Custom Hardcoded Favicon mimicking the requested image with a 'W' -->
+    <title>WET Parser v10.3</title>
+    <!-- Custom Hardcoded Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { 
-            font-family: 'Inter', sans-serif !important; 
-            letter-spacing: -0.01em;
-        }
+        * { font-family: 'Inter', sans-serif !important; letter-spacing: -0.01em; }
         body { background-color: #f1f5f9; padding: 0.5rem; min-height: 100vh; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        /* Input focus logic for mobile zoom prevention */
         input:focus, textarea:focus { font-size: 16px !important; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
-        /* Specific styles for the Price Fetcher paste box */
-        #tool-paste { 
-            font-size: 9.3px !important; /* 7pt */
-            line-height: 1.2;
-        } 
-        #tool-paste::placeholder { 
-            font-size: 13px !important; 
-            font-weight: 400;
-            opacity: 0.6; 
-        }
-
-        /* Narrow header look */
-        .tracking-tighter-extra { letter-spacing: -0.05em; }
+        #tool-paste { font-size: 9.3px !important; line-height: 1.2; } 
+        #tool-paste::placeholder { font-size: 13px !important; font-weight: 400; opacity: 0.6; }
+        .switch { position: relative; display: inline-block; width: 32px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .2s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+        input:checked + .slider { background-color: #6366f1; }
+        input:checked + .slider:before { transform: translateX(14px); }
     </style>
 </head>
 <body class="p-2">
-    <div id="root" class="max-w-4xl mx-auto flex flex-col gap-2">
+    <div id="root" class="max-w-5xl mx-auto flex flex-col gap-2">
         <!-- Header -->
-        <div class="flex items-center justify-between bg-white border border-slate-300 px-3 py-2 rounded shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-300 px-4 py-3 rounded shadow-sm gap-4">
             <div class="flex items-center gap-2">
-                <span id="header-icon">🚀</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter-extra text-lg uppercase">WET Parser 6.1</span>
+                <span id="header-icon" class="text-xl">🚀</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.3</span>
+                <button onclick="openDateModal()" class="ml-2 text-slate-400 hover:text-indigo-600 transition-colors" title="Edit Full Moon Dates">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                </button>
             </div>
-            <div class="flex gap-2">
-                <div id="view-toggle-container" class="flex bg-slate-100 rounded p-1">
-                    <button onclick="setViewMode('fields')" id="btn-fields" class="p-1.5 rounded bg-white shadow-sm text-blue-600" title="Field View">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                    </button>
-                    <button onclick="setViewMode('block')" id="btn-block" class="p-1.5 rounded text-slate-400" title="Summary View">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    </button>
-                    <button onclick="setViewMode('reply')" id="btn-reply" class="p-1.5 rounded text-slate-400" title="Reply Generator">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    </button>
+            
+            <div class="flex flex-wrap gap-4 items-end">
+                <!-- Data Tools -->
+                <div class="flex flex-col gap-1">
+                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Data Engine</div>
+                    <div class="flex bg-slate-100 rounded p-1">
+                        <button onclick="setViewMode('parser')" id="btn-parser" class="p-1.5 px-3 rounded text-[11px] font-bold uppercase transition-all">OTA/Card Parser</button>
+                    </div>
                 </div>
-                <button onclick="clearInput()" class="px-2 py-1 text-slate-400 hover:text-red-500 transition-colors">
+                
+                <!-- Message Generators -->
+                <div class="flex flex-col gap-1">
+                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Message Generators</div>
+                    <div class="flex bg-slate-100 rounded p-1 gap-1">
+                        <button onclick="setViewMode('reply')" id="btn-reply" class="p-1.5 px-3 rounded text-[11px] font-bold uppercase transition-all">Quoter</button>
+                        <button onclick="setViewMode('vol-request')" id="btn-vol-request" class="p-1.5 px-3 rounded text-[11px] font-bold uppercase transition-all">Vol Request</button>
+                        <button onclick="setViewMode('vol-confirm')" id="btn-vol-confirm" class="p-1.5 px-3 rounded text-[11px] font-bold uppercase transition-all text-indigo-600">Vol Confirm</button>
+                    </div>
+                </div>
+
+                <button onclick="clearInput()" class="mb-1 ml-2 px-2 py-1 text-slate-400 hover:text-red-500 transition-colors" title="Clear All Data">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </button>
             </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-2 h-[calc(100vh-85px)]">
-            <!-- Input Area -->
-            <textarea id="input-area" oninput="handleInput()" 
-                class="h-full p-4 border border-slate-300 rounded shadow-inner focus:outline-none bg-white resize-none text-[15px] leading-tight" 
-                placeholder="PASTE BOOKING, CARD, OR INQUIRY DATA..."></textarea>
-
-            <!-- Output Area -->
+        <div class="grid md:grid-cols-2 gap-2 h-[calc(100vh-100px)]">
+            <textarea id="input-area" oninput="handleInput()" class="h-full p-4 border border-slate-300 rounded shadow-inner focus:outline-none bg-white resize-none text-[15px] leading-tight" placeholder="PASTE OTA OR VOLUNTEER DATA..."></textarea>
             <div id="output-container" class="h-full overflow-hidden bg-white border border-slate-300 rounded flex flex-col relative">
                 <div id="empty-state" class="flex-1 flex flex-col items-center justify-center text-slate-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     <p class="mt-2 font-black text-sm tracking-widest uppercase opacity-40">Ready for Paste</p>
                 </div>
-                <div id="results-view" class="hidden flex-1 flex flex-col p-2 gap-1.5 overflow-y-auto custom-scrollbar">
-                    <!-- Dynamic content -->
-                </div>
+                <div id="results-view" class="hidden flex-1 flex flex-col p-2 gap-1.5 overflow-y-auto custom-scrollbar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Editor Modal -->
+    <div id="date-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="font-black text-slate-800 uppercase tracking-widest">Edit Full Moon Dates</h3>
+                <button onclick="closeDateModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="p-4 flex-1">
+                <p class="text-xs text-slate-500 mb-2 font-bold">Use the exact format shown below. The top line must designate the year (e.g. <code>🗓2026🗓</code>).</p>
+                <textarea id="date-editor-text" class="w-full h-64 p-3 border border-slate-300 rounded font-mono text-[13px] leading-relaxed focus:outline-none focus:border-indigo-500 custom-scrollbar whitespace-pre"></textarea>
+            </div>
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-2">
+                <button onclick="resetDates()" class="px-4 py-2 text-slate-600 font-bold uppercase text-xs hover:bg-slate-200 rounded transition-colors mr-auto">Reset Default</button>
+                <button onclick="closeDateModal()" class="px-4 py-2 text-slate-600 font-bold uppercase text-xs hover:bg-slate-200 rounded transition-colors">Cancel</button>
+                <button onclick="saveDates()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold uppercase text-xs rounded transition-colors shadow-sm">Save Dates</button>
             </div>
         </div>
     </div>
 
     <script>
-        let viewMode = 'fields';
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        let viewMode = 'parser';
         let lastParsedData = null;
         
         let quoteState = {
-            guestName: 'Guest', guests: 2, nights: 2, budget: 0, standard: 0, superior: 0, female: 0,
+            guestName: 'Guest', guests: 1, nights: 1, budget: 0, standard: 0, superior: 0, female: 0,
             exBudgetBed: 199, exStandBed: 250, exSuperBed: 299, exFemBed: 199,
             exBudgetPriv: 1599, exStandPriv: 1999, exSuperPriv: 2399, exFemPriv: 1599,
-            extraNightsOpen: false,
-            checkinISO: '',
-            checkoutISO: ''
+            extraNightsOpen: false, checkinISO: '', checkoutISO: ''
         };
 
-        const f = (num) => {
-            if (!num) return "0";
-            return new Intl.NumberFormat('en-US').format(num);
-        };
+        let volState = { name: '', role: 'standard', arrivalBad: false, departureBad: false, noFullMoon: false, hasArtWindow: false, dateOverride: false, unablePreapprove: false, fullyBooked: false, discountStay: false, startDate: '', endDate: '' };
+
+        const f = (num) => !num ? "0" : new Intl.NumberFormat('en-US').format(num);
+
+        // ==========================================
+        // VOLUNTEER CONSTANTS, DATES & TEMPLATES
+        // ==========================================
+        const DEFAULT_DATES_TEXT = `🗓2026🗓
+MAY (25Apr-5May) - 📍25Apr 🎉29Apr-3May 👋5May
+JUNE (26May-5Jun) - 📍26May 🎉30May-3Jun 👋5Jun
+JUNE2 (23Jun-3Jul) - 📍23Jun 🎉27Jun-1Jul 👋3Jul
+JULY (25Jul-4Aug) - 📍25July 🎉29Jul-2Aug 👋4Aug
+AUGUST (22Aug-1Sep) - 📍22Aug 🎉26-30Aug 👋1Sep
+SEPTEMBER (20-30Sep) - 📍20Sep 🎉24-28Sep 👋30Sep
+OCTOBER (21-31Oct) - 📍21Oct 🎉25-29Oct 👋31Oct
+NOVEMBER (18-28Nov) - 📍18Nov 🎉22-26Nov 👋28Nov
+DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec 🎉29Dec-2Jan 👋4Jan`;
+
+        let FMW_RANGES = [];
+
+        function parseDatesText(text) {
+            let year = new Date().getFullYear();
+            const yearMatch = text.match(/🗓(\d{4})🗓/);
+            if (yearMatch) year = parseInt(yearMatch[1]);
+            
+            const lines = text.split('\n');
+            const ranges = [];
+            for(let line of lines) {
+                line = line.trim();
+                if(!line.includes('(') || !line.includes(')')) continue;
+                
+                const match = line.match(/^(.*?)\s*\((.*?)-(.*?)\)\s*-\s*(.*)$/);
+                if (match) {
+                    const month = match[1].trim();
+                    const startStr = match[2].trim();
+                    const endStr = match[3].trim();
+                    const fullStr = match[4].trim();
+                    const rangeStr = `${startStr}-${endStr}`;
+                    
+                    const start = convertToISO(startStr + " " + year);
+                    let endYear = year;
+                    if (startStr.includes('Dec') && endStr.includes('Jan')) endYear = year + 1;
+                    const end = convertToISO(endStr + " " + endYear);
+                    
+                    const partyStarts = [];
+                    const partyMatches = [...fullStr.matchAll(/🎉(\d{1,2}[A-Za-z]{0,3}(?:\-\d{1,2}[A-Za-z]{3})?)/g)];
+                    partyMatches.forEach(m => {
+                        let pStr = m[1];
+                        let pDayMatch = pStr.match(/^\d+/);
+                        if(pDayMatch) {
+                            let pDay = pDayMatch[0];
+                            let pMonthMatch = pStr.match(/[A-Za-z]{3}/);
+                            let pMonth = pMonthMatch ? pMonthMatch[0] : startStr.replace(/\d+/g, '');
+                            
+                            let pYear = year;
+                            if (startStr.includes('Dec') && pMonth === 'Jan') pYear = year + 1;
+                            const pIso = convertToISO(pDay + pMonth + " " + pYear);
+                            if (pIso) partyStarts.push(pIso);
+                        }
+                    });
+                    if(partyStarts.length === 0) partyStarts.push(start); // fallback
+                    
+                    ranges.push({ month, start, end, rangeStr, fullStr, partyStarts });
+                }
+            }
+            return ranges;
+        }
+
+        function initDates() {
+            const stored = localStorage.getItem('fmw_dates_raw');
+            if (stored) {
+                FMW_RANGES = parseDatesText(stored);
+                if (FMW_RANGES.length === 0) FMW_RANGES = parseDatesText(DEFAULT_DATES_TEXT);
+            } else {
+                FMW_RANGES = parseDatesText(DEFAULT_DATES_TEXT);
+            }
+        }
+        initDates(); // Call immediately
+
+        function openDateModal() {
+            const stored = localStorage.getItem('fmw_dates_raw') || DEFAULT_DATES_TEXT;
+            document.getElementById('date-editor-text').value = stored;
+            document.getElementById('date-modal').classList.remove('hidden');
+        }
+        function closeDateModal() { document.getElementById('date-modal').classList.add('hidden'); }
+        function resetDates() { document.getElementById('date-editor-text').value = DEFAULT_DATES_TEXT; }
+        function saveDates() {
+            const val = document.getElementById('date-editor-text').value;
+            localStorage.setItem('fmw_dates_raw', val);
+            initDates();
+            closeDateModal();
+            handleInput(); // Re-parse everything with new dates
+        }
+
+        function getActiveRanges() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            return FMW_RANGES.filter(r => new Date(r.start) >= today);
+        }
+
+        function getCalendarText(type = 'detailed') {
+            const active = getActiveRanges();
+            const yearMatch = (localStorage.getItem('fmw_dates_raw') || DEFAULT_DATES_TEXT).match(/🗓(\d{4})🗓/);
+            const displayYear = yearMatch ? yearMatch[1] : new Date().getFullYear();
+            
+            let text = `🗓${displayYear}🗓\n`;
+            active.forEach(r => {
+                if (type === 'detailed') text += `${r.month} (${r.rangeStr}) - ${r.fullStr}\n`;
+                else text += `${r.month} (${r.rangeStr})\n`;
+            });
+            return text.trim();
+        }
+
+        const ART_PURE_BODY = `We are always looking for great art and we'd love to see what you can do! Art volunteering is very freeform and flexible!\n\nWe like to let artists be artists, so YOU choose what you'd like to create and where! Staff will support with supplies and help, but YOU set your project and schedule! (Just make sure you get it done before you go, and leave your @tag so people can follow you!)\n\nHaad Rin is VERY quiet between Full Moon Weeks, so, while staff and a few guests and volunteers will be around, NO babysitting or regulating. You are on your own to explore the island(s) and work when you please. We don't care if it's 4am each night, or make a mural in 3 days and take a week off... Just leave us with something beautiful!`;
+        const ART_HYBRID_CLAUSE = `BUT, your stay includes Full Moon Week dates. During that time there's NO time for art and if you stay with us, you'll be doing hostel & party work for those 5 or 6 days. \n\nIf you DO NOT want to do that, please let us know and change your dates to NOT include these dates:\n\n${getCalendarText('simple')}\n\nIf you DO want to join in the Full Moon Week volunteering, we'll include all the details below:\n\n`;
+        const STANDARD_TASKS_BODY = `------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes! Your tasks include:\n\n🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n🎱 Games: run TOURNAMENTS and share promos so guests have FUN\n📸 Social Media: make IG & TIKTOK content, get others to TAG us, be ACTIVE in chats.\n🍺 Bars: Help our bartenders (no skills needed).\n🛟 Floater: literally just BE THERE and ready to help\n\nWe require just 🗓5 LONG DAYS of work PER MONTH🗓 - 95% free time as long as you want before & after. It's very quiet in town between Full Moons, but you can chill or explore the islands. We're not gonna babysit or give you busywork; just be active in the staff chat.\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍`;
+        
+        const SOCIAL_TASKS_BODY = `------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes! Here are the job tasks:\n\n----------------------------------\n💬 GROUPS & CHATS 💬\n----------------------------------\n🎉 Online promotion is VITAL - the MORE people recommending WET (Hostel & Parties), the bigger and better our party is! We are the #1 preparty for major events and our 🎟Discount Ticket Packages are the best deal. Plus we do nightly group meetups with 🥃free shots, so if people know about it, they will join!\n\n💬 We'll send you a list of groups to join and be active in. If you know others - especially for different demographics (like German, LGBTQ, Solo Travel, etc) - please share!\n\nPeople are posting everywhere asking advice about parties, tickets, meetups, hostels, etc. and we want to be a helpful source of info that favors WET, not just an annoying ad spammer! Volunteers need to check groups & chats daily to answer questions (or ask/tag me if you don't know) and recommend WET to everyone and build hype!\n\n--------------------------------------\n💬 INSTAGRAM & TIKTOK 💬\n--------------------------------------\n📸 Between Full Moons, post IG stories AND Feed/Reel posts several times a week. (Without organic content, it's just a wall of event flyers!) During Full Moon Week we want to post TONS of content.\n🎥 Post as often as possible on TikTok (it's newer & smaller).\n✂ Edit content for now & future. We have a content archive you can use & we need you to leave us with more content for it.\n📂Between Full Moons, spend some time organizing that content archive.\n📤 Send us raw content before you leave for future use.\n#️⃣ Get others to tag us (free shot - you can join them too!) & tag them in our posts! Also ask for a review on Google and TripAdvisor for more free shots!\n\n----------------------------------\n📢 GROUND PROMO 📢\n----------------------------------\n👀We ask you to be our eyes & ears making sure volunteer promo shifts are out engaging with guests all day. The WET group chats are useful for this - volunteers send pics out promoting; games shifts post to gather tournament players; and all volunteers need to be checking their phones regularly to be active in our work chat and promoting in groups/chats.\n\nOur Promotion Volunteer checks hourly that promo & games are active, reminding them to post activity announcements. Any creative input to improve is always welcome too!\n\n💬 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!\n\n-----------------------------\n🎱🎫 VARIETY 🎫🎱\n-----------------------------\nWe also try to give our social media volunteers a few other shifts, just for a little variety! \n\n🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n🎱 Games: run TOURNAMENTS and share promos so guests have FUN\n🍺 Bars: Help our bartenders (no skills needed).\n🛟 Floater: literally just BE THERE and ready to help`;
+        
+        const BUMMER_FULL = `------------------------------------\n🚨THE BUMMER STUFF🚨\n------------------------------------\nTo avoid flakes, we require a deposit and bookings (about 3500 baht, fully REFUNDABLE). This shows commitment & gives you the guest experience (including guest chats). On confirmation, we'll send you simple links to follow.\n\nNo-show/last-minute cancellation or repeatedly not doing shifts/tasks will affect refunds (this is very rare), but otherwise all will be FULLY REFUNDED.\n\n🚨IF you are NOT OK with this, we are not a match for hosting you.`;
+        const BUMMER_LIGHT = `------------------------------------\n🚨THE BUMMER STUFF🚨\n------------------------------------\nWhile we normally require a deposit, for stays outside of Full Moon Week we just ask you to make 2 small bookings (1-night Hostelworld + 1-night BDC). This confirms your commitment and lets you join the guest chats.\n\nBoth will be FULLY REFUNDED at the end of your stay from reception, unless you no-show or don't make art!\n\n🚨IF you are NOT ok with this, please let us know right away.`;
+        const FOOTER_LINKS = `------------------------------------\n💬 GROUPS & CHATS 💬\n------------------------------------\n⭐Even if you don't join us, these are great resources!⭐\n\nPromoting is a big part of your job. Help us spread the word about our hostel & parties online too! NEVER hard promote, we just mention WET when it's relevant.\n\n✅ REQUIRED TO JOIN AND BE ACTIVE IN: ✅\nHOSTELWORLD CHAT: join on the app with your booking.\n\nINSTAGRAM: https://tinyurl.com/FMPIGChat\n\nWHATSAPP: https://tinyurl.com/FMPSiteChat & https://tinyurl.com/FullMoonChat\n\n✅ FOLLOW OUR SOCIALS: ✅\nhttps://www.tiktok.com/@wetpoolparty\nhttps://instagram.com/WETPoolParty\nhttps://instagram.com/WETHostel\nhttps://instagram.com/FullMoonWeek\n\n🔗 MORE RESOURCES: 🔗\nhttps://www.wildandwandering.com/links#h.3ocvvd04j9x - tons of travel chats!\n\nWhen you confirm, we will provide more useful social media & travel links too! Let us know if you'd like to join us!`;
+        const DATE_EXPLAIN_HEADER = `📍DAY 1: Latest Arrival Date\n😴 DAY 2: Relax, Possible Light Promo\n📅 DAY 3: Schedule Created, Possible Light Promo\n📋 DAY 4: Training, Possible Light Promo\n🎉 DAYS 5&6: Work Shifts for 24-Hour Parties\n🌕 DAY 7: Full Moon Party, Work Shifts\n🎉 DAYS 8&9: Work Shifts for 24-Hour Parties\n🩹 DAY 10: Recovery Day, Final Tasks\n👋 DAY 11: Earliest Departure Date\n\n`;
 
         function convertToISO(dateStr) {
-            if (!dateStr || dateStr.length < 5) return '';
+            if (!dateStr) return null;
             const months = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-            const match = dateStr.match(/([A-Z][a-z]{2})\s(\d{1,2}),\s(\d{4})/i);
-            if (match) {
-                const m = months[match[1]];
-                const d = match[2].padStart(2, '0');
-                const y = match[3];
-                return `${y}-${m}-${d}`;
+            
+            const match = dateStr.match(/([a-zA-Z]{3})|(\d{1,2})|(\d{4})/g);
+            if (!match) return null;
+            
+            let m="", d="", y="2026";
+            match.forEach(part => {
+                if (/^[a-zA-Z]{3}$/i.test(part)) m = months[part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()];
+                else if (part.length === 4) y = part;
+                else if (part.length <= 2) d = part.padStart(2, '0');
+            });
+            
+            if (m && d && y) return `${y}-${m}-${d}`;
+            
+            // fallback
+            let parts = dateStr.split(/[\/\s,]+/);
+            if (parts.length >= 2) {
+                const mf = months[parts[0].substring(0,3)];
+                if(mf) {
+                    const df = parts[1].padStart(2, '0');
+                    const yf = parts[2] || "2026";
+                    return `${yf}-${mf}-${df}`;
+                }
             }
-            return '';
+            return null;
         }
 
-        function findLabelValue(lines, label) {
-            const idx = lines.findIndex(l => l.toLowerCase().includes(label.toLowerCase()));
-            if (idx === -1) return "";
-            const currentLine = lines[idx].replace(new RegExp(label + ':?', 'i'), '').trim();
-            if (currentLine.length > 2) return currentLine;
-            if (lines[idx + 1]) return lines[idx + 1];
-            return "";
+        function formatDateHTML(dateObj) {
+            if (!dateObj) return "YYYY-MM-DD";
+            return dateObj.toISOString().split('T')[0];
         }
 
+        function getConfirmDates() {
+            let bdc_in = "YYYY-MM-DD", bdc_out = "YYYY-MM-DD", agoda_in = "YYYY-MM-DD", hw_in = "YYYY-MM-DD", hw_out = "YYYY-MM-DD";
+            
+            if (volState.startDate && volState.endDate) {
+                const start = new Date(volState.startDate);
+                start.setHours(12, 0, 0, 0); 
+                const end = new Date(volState.endDate);
+                end.setHours(12, 0, 0, 0);
+
+                const nextDay = new Date(start); nextDay.setDate(start.getDate() + 1);
+
+                bdc_in = formatDateHTML(start);
+                bdc_out = formatDateHTML(nextDay);
+                agoda_in = formatDateHTML(nextDay);
+
+                let matchedParty = null;
+                for (let range of FMW_RANGES) {
+                    const rStart = new Date(range.start); rStart.setHours(12,0,0,0);
+                    const rEnd = new Date(range.end); rEnd.setHours(12,0,0,0);
+                    if (start <= rEnd && end >= rStart) {
+                        for (let pStartStr of range.partyStarts) {
+                            const pStart = new Date(pStartStr); pStart.setHours(12,0,0,0);
+                            if (start <= pStart && end >= pStart) {
+                                matchedParty = pStart;
+                                break;
+                            }
+                        }
+                        if (matchedParty) break;
+                        matchedParty = new Date(range.partyStarts[0]);
+                        break;
+                    }
+                }
+
+                if (matchedParty) {
+                    const hwInDate = new Date(matchedParty); hwInDate.setDate(matchedParty.getDate() - 2);
+                    hw_in = formatDateHTML(hwInDate);
+                    const hwOutDate = new Date(matchedParty); hwOutDate.setDate(matchedParty.getDate() - 1);
+                    hw_out = formatDateHTML(hwOutDate);
+                }
+            }
+            return { bdc_in, bdc_out, agoda_in, hw_in, hw_out };
+        }
+
+        // ==========================================
+        // PARSING ENGINE (OTA + VOLUNTEER)
+        // ==========================================
         function handleInput() {
             const val = document.getElementById('input-area').value;
             if (!val.trim()) {
@@ -131,23 +322,33 @@
             }
             lastParsedData = parseData(val);
             if (lastParsedData) {
-                quoteState.guestName = lastParsedData.firstName || 'Guest';
-                quoteState.guests = lastParsedData.guestCount || 2;
-                quoteState.nights = lastParsedData.nights || 2;
-                quoteState.checkinISO = lastParsedData.checkinISO || '';
-                quoteState.checkoutISO = lastParsedData.checkoutISO || '';
+                if (lastParsedData.type === 'volunteer') {
+                    volState.name = lastParsedData.name;
+                    volState.role = lastParsedData.role;
+                    volState.arrivalBad = lastParsedData.arrivalBad;
+                    volState.departureBad = lastParsedData.departureBad;
+                    volState.noFullMoon = lastParsedData.noFullMoon;
+                    volState.hasArtWindow = lastParsedData.hasArtWindow;
+                    volState.startDate = lastParsedData.startDate;
+                    volState.endDate = lastParsedData.endDate;
+                    if (viewMode === 'parser' || viewMode === 'reply') setViewMode('vol-request');
+                } else {
+                    quoteState.guestName = lastParsedData.firstName || 'Guest';
+                    quoteState.guests = lastParsedData.guestCount || 1;
+                    quoteState.nights = lastParsedData.nights || 1;
+                    quoteState.checkinISO = lastParsedData.checkinISO || '';
+                    quoteState.checkoutISO = lastParsedData.checkoutISO || '';
+                    if (viewMode === 'vol-request' || viewMode === 'vol-confirm') setViewMode('parser');
+                }
             }
             renderResults();
         }
 
-        function clearInput() {
-            document.getElementById('input-area').value = '';
-            handleInput();
-        }
+        function clearInput() { document.getElementById('input-area').value = ''; handleInput(); }
 
         function setViewMode(mode) {
             viewMode = mode;
-            ['btn-fields', 'btn-block', 'btn-reply'].forEach(id => {
+            ['btn-parser', 'btn-reply', 'btn-vol-request', 'btn-vol-confirm'].forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
                 const isMatch = id === 'btn-' + mode;
@@ -161,9 +362,79 @@
 
         function parseData(text) {
             const cleanText = text.replace(/[\u202a\u202b\u202c\u202d\u202e]/g, "");
+
+            const volPatterns = [
+                /(.*?)\s+wants to stay/i, 
+                /(.*?)\s+has applied/i, 
+                /(.*?)\s+have applied/i,
+                /(.*?)\s+have confirmed their stay/i,
+                /(.*?)\s+has confirmed their stay/i
+            ];
+            let volName = "";
+            for (let pattern of volPatterns) {
+                const match = cleanText.match(pattern);
+                if (match) { volName = match[1].trim(); break; }
+            }
+            
+            if (volName || cleanText.includes("Ideal dates:") || cleanText.includes("Arrive on")) {
+                return parseVolunteer(cleanText, volName);
+            }
+
             const isBookingCom = /booking\.com|Commissionable\s+amount/i.test(cleanText);
             const isCreditCard = !isBookingCom && (/\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}/.test(cleanText) || /cvv|cv2|card\s*number/i.test(cleanText));
-            return isBookingCom ? parseBookingCom(cleanText) : (isCreditCard ? parseCardData(cleanText) : parseAirbnb(cleanText));
+
+            if (isBookingCom) return parseBookingCom(cleanText);
+            if (isCreditCard) return parseCardData(cleanText);
+            return parseAirbnb(cleanText);
+        }
+
+        function parseVolunteer(cleanText, volName) {
+            let name = volName.split(" wants")[0].trim() || "";
+            let datesMatch = cleanText.match(/Ideal dates:\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*until\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i);
+            
+            if (!datesMatch) {
+                datesMatch = cleanText.match(/Arrive on\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*and leave on\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i);
+            }
+
+            let arrivalBad = false, departureBad = false, hasOverlap = false, hasArtWindow = false;
+            let startISO = "", endISO = "";
+            
+            if (datesMatch) {
+                const start = new Date(convertToISO(datesMatch[1]));
+                const end = new Date(convertToISO(datesMatch[2]));
+                
+                startISO = convertToISO(datesMatch[1]);
+                endISO = convertToISO(datesMatch[2]);
+                
+                const activeRanges = getActiveRanges();
+                
+                activeRanges.forEach(range => {
+                    const rStart = new Date(range.start);
+                    const rEnd = new Date(range.end);
+                    if (rStart >= new Date()) {
+                        // Boundary Logic: Arriving exactly on start or leaving exactly on end is OK
+                        if (start <= rEnd && end >= rStart) {
+                            hasOverlap = true;
+                            if (start > rStart) arrivalBad = true;
+                            if (end < rEnd) departureBad = true;
+                        }
+                    }
+                });
+
+                let maxWindow = 0, currentWindow = 0;
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    let isFMW = activeRanges.some(r => d >= new Date(r.start) && d <= new Date(r.end));
+                    if (!isFMW) { currentWindow++; maxWindow = Math.max(maxWindow, currentWindow); }
+                    else { currentWindow = 0; }
+                }
+                if (maxWindow >= 7) hasArtWindow = true;
+            }
+            
+            let role = 'standard';
+            if (cleanText.toLowerCase().includes('hostel walls') || cleanText.toLowerCase().includes('artist') || cleanText.toLowerCase().includes('painting & decorating')) role = 'art';
+            if (cleanText.toLowerCase().includes('online') || cleanText.toLowerCase().includes('social media')) role = 'social';
+            
+            return { type: 'volunteer', name, role, arrivalBad, departureBad, noFullMoon: !hasOverlap, hasArtWindow, startDate: startISO, endDate: endISO };
         }
 
         function parseCardData(text) {
@@ -178,119 +449,306 @@
             }
             const cvv = (text.match(/\b\d{3}\b/g) || []).find(num => !expiry.startsWith(num) && !cardNumber.startsWith(num)) || "";
             const zip = lines.find(l => /^\d{4,6}$/.test(l) && l !== cvv && !expiry.includes(l) && !/^20\d{2}$/.test(l)) || "";
-            const labelsToExclude = ['visa', 'mastercard', 'cvv', 'cv2', 'expires', 'card type', 'card number', 'name on card', 'cardholder'];
             const nameIdx = lines.findIndex(l => /name\s*on\s*card/i.test(l));
             let name = (nameIdx !== -1 && lines[nameIdx + 1]) ? lines[nameIdx + 1] : "";
-            if (!name) {
-                name = lines.find(l => !/\d/.test(l) && l.length > 3 && !labelsToExclude.some(lbl => l.toLowerCase().includes(lbl))) || "Unknown Cardholder";
-            }
+            if (!name) name = lines.find(l => !/\d/.test(l) && l.length > 3 && !['visa', 'mastercard', 'cvv', 'cv2', 'card number'].some(lbl => l.toLowerCase().includes(lbl))) || "Unknown Cardholder";
+            
             const block = `${name}\n${cardNumber} ${expiry} ${cvv}\n${[email, zip].filter(x => x).join(' ')}`.trim();
             return { type: 'card', block, firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' ') };
         }
 
         function parseBookingCom(text) {
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            const name = findLabelValue(lines, 'Guest name');
-            const commAmtRaw = findLabelValue(lines, 'Commissionable amount').replace(/[^\d.]/g, '') || "0";
-            const commChargesRaw = findLabelValue(lines, 'Commission and charges').replace(/[^\d.]/g, '') || "0";
+            const findLabelValueExt = (lbl) => {
+                const idx = lines.findIndex(l => l.toLowerCase().replace(/[^a-z]/g,'').includes(lbl.toLowerCase().replace(/[^a-z]/g,'')));
+                if (idx === -1) return "";
+                const currentLineClean = lines[idx].split(new RegExp(lbl + ':?', 'i')).pop().trim();
+                if (currentLineClean.length > 2) return currentLineClean;
+                if (lines[idx + 1]) return lines[idx + 1];
+                return "";
+            };
+
+            const name = findLabelValueExt('Guest name');
+            const commAmtRaw = findLabelValueExt('Commissionable amount').replace(/[^\d.]/g, '') || "0";
+            const commChargesRaw = findLabelValueExt('Commission and charges').replace(/[^\d.]/g, '') || "0";
             const netPrice = (parseFloat(commAmtRaw) - parseFloat(commChargesRaw) || 0).toFixed(2);
-            const checkin = findLabelValue(lines, 'Check-in');
-            const checkout = findLabelValue(lines, 'Check-out');
-            const otherDetails = `${name}\n${text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "---"}\n${text.match(/\+[\d\s-]{9,20}/)?.[0] || "---"}\nTOTAL PRICE: ${commAmtRaw}\nFEE: ${commChargesRaw}\nNET PRICE: ${netPrice}\nCheck-in: ${checkin}\nCheck-out: ${checkout}\nBOOKED: ${findLabelValue(lines, 'Received')}\n${findLabelValue(lines, 'Booking number:')}\n${findLabelValue(lines, 'Channel:') || "---"}`;
+            const checkin = findLabelValueExt('Check-in');
+            const checkout = findLabelValueExt('Check-out');
+            
             return { 
                 type: 'booking', firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' '), 
                 email: text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] || "",
                 phone: text.match(/\+[\d\s-]{9,20}/)?.[0] || "",
                 totalPrice: `THB ${f(commAmtRaw)}`, commission: `THB ${f(commChargesRaw)}`, payout: `THB ${f(netPrice)}`, 
-                guestCount: parseInt(findLabelValue(lines, 'Total guests')) || 2, 
-                nights: parseInt(findLabelValue(lines, 'Length of stay')) || 1,
+                guestCount: parseInt(findLabelValueExt('Total guests')) || 2, nights: parseInt(findLabelValueExt('Length of stay')) || 1,
                 checkinISO: convertToISO(checkin), checkoutISO: convertToISO(checkout),
-                otherDetails, city: "", country: ""
+                otherDetails: `${name}\nTOTAL: ${commAmtRaw}\nFEE: ${commChargesRaw}\nNET: ${netPrice}\n${checkin} - ${checkout}`, city: "", country: ""
             };
         }
 
         function parseAirbnb(text) {
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const isSnippet = lines.length < 10 && lines.some(l => /\d+\s+guests?/.test(l));
             const findPattern = (regex) => { const match = text.match(regex); return match ? (match[1] || match[0]).trim() : null; };
+            const findLabelValueExt = (lbl) => {
+                const idx = lines.findIndex(l => l.toLowerCase().replace(/[^a-z]/g,'').includes(lbl.toLowerCase().replace(/[^a-z]/g,'')));
+                if (idx === -1) return "";
+                const currentLineClean = lines[idx].split(new RegExp(lbl + ':?', 'i')).pop().trim();
+                if (currentLineClean.length > 2) return currentLineClean;
+                if (lines[idx + 1]) return lines[idx + 1];
+                return "";
+            };
+            
+            if (isSnippet) {
+                const name = lines[0]; const listing = lines[1];
+                const dateLine = lines.find(l => /\d/.test(l) && l.includes('night'));
+                const guestLine = lines.find(l => /^\d+/.test(l) && l.toLowerCase().includes('guest'));
+                const guests = guestLine ? (parseInt(guestLine) || 1) : 1;
+                const nightsMatch = dateLine ? dateLine.match(/(\d+)\s+nights?/) : null; const nights = nightsMatch ? parseInt(nightsMatch[1]) : 1;
+                const rangeMatch = dateLine ? dateLine.match(/([A-Z][a-z]{2})\s(\d{1,2})[^\d]+(\d{1,2})/) : null;
+                let checkin = "", checkout = "";
+                if (rangeMatch) { checkin = `${rangeMatch[1]} ${rangeMatch[2]}`; checkout = `${rangeMatch[1]} ${rangeMatch[3]}`; }
+
+                return {
+                    type: 'airbnb', firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' '),
+                    guestCount: guests, nights: nights, checkinISO: convertToISO(checkin), checkoutISO: convertToISO(checkout),
+                    listingName: listing, city: "", country: "", email: "", phone: "",
+                    totalPrice: "---", commission: "---", payout: "---", otherDetails: `${name}\n${listing}\n${dateLine}\n${guests} guests`
+                };
+            }
+
             let fullName = lines[0];
-            if (fullName.includes('·') || fullName.includes('OVERALL')) {
-                fullName = findPattern(/About\s+([A-Z][a-zà-ÿ]+\s+[A-Z][a-zà-ÿ]+)/i) || lines[0];
-            }
+            if (fullName.includes('confirmed') || fullName.includes('New booking')) fullName = lines.find(l => !l.includes('booking') && !l.includes('arrives') && l.length > 3) || lines[0];
+            if (fullName.includes('·')) fullName = findPattern(/About\s+([A-Z][a-zà-ÿ]+\s+[A-Z][a-zà-ÿ]+)/i) || lines[0];
+            
             const nameParts = fullName.split(' ');
-            const firstName = nameParts[0] || "";
-            const lastName = nameParts.slice(1).join(' ') || "";
-            const guests = parseInt(findPattern(/(\d+)\s+guests?/i)) || 1;
-            const nightsMatch = text.match(/(\d+)\s+nights/i);
-            const nights = nightsMatch ? parseInt(nightsMatch[1]) : 1;
-            const dates = findPattern(/([A-Z][a-z]{2}\s\d{1,2}.*\(.*nights?\))/i) || lines.find(l => l.includes('–') && /\d/.test(l)) || "";
-            const locationLine = findPattern(/Lives\s+in\s+([^.\n]+)/i);
+            const locIdx = lines.findIndex(l => l.includes(', ') && /[A-Z]{2}$/.test(l));
+            const locationLine = locIdx !== -1 ? lines[locIdx] : "";
             let city = "", country = "";
-            if (locationLine) {
-                const parts = locationLine.split(',').map(p => p.trim());
-                if (parts.length >= 2) { city = parts[0]; country = parts[parts.length - 1]; }
-                else { country = parts[0]; }
-            }
-            const phoneMatch = text.match(/Phone:?\s*(?:‪)?(\+?[\d\s-]{7,25})(?:‬)?/i);
-            const phone = phoneMatch ? phoneMatch[1].replace(/[\u202c\u202d\u202a]/g, '').trim() : "";
+            if (locationLine) { const parts = locationLine.split(',').map(p => p.trim()); city = parts[0]; country = parts[1]; }
+
+            const checkin = findLabelValueExt('Check-in'); const checkout = findLabelValueExt('Checkout');
             const totalMatches = Array.from(text.matchAll(/Total\s+\(THB\)\s+฿?([\d,.]+)/gi));
-            const guestPaid = totalMatches[0] ? totalMatches[0][1] : "0";
-            const hostPayout = totalMatches.length > 1 ? totalMatches[totalMatches.length - 1][1] : guestPaid;
-            const serviceFee = findPattern(/Host\s+service\s+fee.*\s+[−-]?฿?([\d,.]+)/i) || "0";
-            const guestsPrice = findPattern(/(\d+\s+guest\s+·\s+฿[\d,.]+)/i) || "";
-            const bookingDate = findPattern(/Booking\s+date\s+(.*)/i) || "";
-            const confCode = findPattern(/Confirmation\s+code\s+([A-Z0-9]+)/i);
-            const policy = findPattern(/Cancellation\s+policy\s+(.*)/i);
-            const listingName = lines.find((l, i) => i > 0 && i < 6 && (l.includes('·') || l.includes('Style') || l.includes('OVERALL')));
-            const airCheckin = findLabelValue(lines, 'Check-in');
-            const airCheckout = findLabelValue(lines, 'Checkout');
-            const otherDetails = `${firstName} ${lastName}\n${city || "---"}, ${country || "---"}\n${phone || "---"}\nTOTAL PRICE: ${guestPaid.replace(/,/g, '')}\nFEE: ${serviceFee.replace(/[^\d.]/g, '')}\nNET PRICE: ${hostPayout.replace(/,/g, '')}\n${dates}\n${guestsPrice}\nBOOKED: ${bookingDate}\n${confCode || "---"}\nCANCELLATION: ${policy || "---"}\n${listingName || "---"}`;
+            const guestPaid = totalMatches[0] ? totalMatches[0][1] : (text.match(/Total\s*\(THB\)\s*\n฿?([\d,.]+)/i)?.[1] || "0");
+            const payoutMatch = text.match(/You\s+earn\s*\n฿?([\d,.]+)/i) || text.match(/You\s+earn\s+฿?([\d,.]+)/i);
+            const hostPayout = payoutMatch ? payoutMatch[1] : (totalMatches.length > 1 ? totalMatches[totalMatches.length - 1][1] : guestPaid);
+            const feeMatch = text.match(/Host\s+service\s+fee.*\s+[−-]?฿?([\d,.]+)/i);
+            const serviceFee = feeMatch ? feeMatch[1] : "0";
+
+            const confCode = findLabelValueExt('Confirmation code');
+            let policy = findLabelValueExt('Cancellation policy') || lines.find(l => l.includes('Your cancellation policy'))?.split('is').pop().trim();
+            if (policy) policy = policy.replace(/^for guests is\s+/i, '').replace(/\.$/, '').trim();
+            const listingName = lines.find(l => l.includes('Hostel') || l.includes('WET Pool Party') || l.includes('2-nt'));
+
+            const otherDetails = `${fullName}\n${city || "---"}, ${country || "---"}\nTOTAL PRICE: ${guestPaid.replace(/,/g, '')}\nFEE: ${serviceFee.replace(/[^\d.]/g, '')}\nNET PRICE: ${hostPayout.replace(/,/g, '')}\nCheck-in: ${checkin}\nCheckout: ${checkout}\nCODE: ${confCode || "---"}\nPOLICY: ${policy || "---"}\nLISTING: ${listingName || "---"}`;
+
             return { 
-                type: 'airbnb', firstName, lastName, city, country, email: findPattern(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/) || "", phone, 
+                type: 'airbnb', firstName: nameParts[0], lastName: nameParts.slice(1).join(' '), city, country, email: "", phone: "",
                 totalPrice: `฿${f(guestPaid.replace(/,/g, ''))}`, commission: `฿${f(serviceFee.replace(/[^\d.]/g, ''))}`, payout: `฿${f(hostPayout.replace(/,/g, ''))}`, 
-                guestCount: guests, nights: nights,
-                checkinISO: convertToISO(airCheckin), checkoutISO: convertToISO(airCheckout),
+                guestCount: parseInt(findLabelValueExt('Guests')) || 1, nights: 1,
+                checkinISO: convertToISO(checkin), checkoutISO: convertToISO(checkout),
                 otherDetails, listingName 
             };
         }
 
-        function updateQuote(field, val) {
-            quoteState[field] = field === 'guestName' ? val : (parseFloat(val) || 0);
-            const textarea = document.getElementById('reply-text');
-            if (textarea) textarea.value = generateReplyString();
-            const linkArea = document.getElementById('booking-link-container');
-            if (linkArea) linkArea.innerHTML = generateBookingLinkHTML();
-        }
+        function updateVol(field, val) { volState[field] = val; renderResults(); }
 
-        function openBookingLink(url) {
-            window.open(url, '_blank');
-            setTimeout(() => {
-                const pasteArea = document.getElementById('tool-paste');
-                if (pasteArea) pasteArea.focus();
-            }, 200);
-        }
-
-        function generateBookingLinkHTML() {
-            if (!quoteState.checkinISO || !quoteState.checkoutISO) {
-                return `<div class="py-2 text-[10px] text-center text-slate-400 bg-slate-50 border border-dashed rounded opacity-60">No Dates Detected for Link</div>`;
+        function generateVolResponse() {
+            const { name, role, arrivalBad, departureBad, noFullMoon, hasArtWindow, dateOverride, unablePreapprove, fullyBooked, discountStay } = volState;
+            const hi = name ? `Hi ${name},` : "Hi,";
+            
+            if (role === 'art' && (fullyBooked || discountStay)) {
+                return `⚠️ ERROR: INVALID TOGGLE COMBINATION ⚠️\n\nYou selected 'Full?' or 'Discount?' for an ART application. We are never fully booked between Full Moons. Please uncheck the 'Full?' or 'Discount?' toggles to generate the correct response for this artist.`;
             }
+
+            if (fullyBooked) {
+                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But every month we have at least one or two cancellations or no-shows, so let us know if you'd be available last-minute for a stay that includes at least one of these periods:\n\n${getCalendarText('simple')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you if space opens up! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+            }
+
+            if (discountStay) {
+                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But we've been getting TONS of requests so we thought we could offer a 50% discount on Full Moon Party stays in exchange for very part-time volunteering, if you are available for the entire Full Moon Week from 3 days before Full Moon Party to 3 days after.\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes!\n\nWe have an orientation 3 days before Full Moon Party, and then we ask you for 3 hours per day volunteering for the next 5 days. You will only work on promo tasks - the fun interactive stuff:\n\n📸 Take pics/vids for social media later\n🎥 Tag us on social media\n✍ Leave Google & TripAdvisor reviews\n💬 Mention our parties on Hostelworld chat & other chats\n🎫 Flyer around town to promote our party & discount ticket packages\n🎱 Helping with games!\n\nExtra perks:\n🎉 Discount tickets/free taxi to major parties\n🥃 Free shots (for you & them):\n     - every group of 3+ you bring in!\n     - anyone tagging us on social media!\n     - anyone leaving a good, honest (not fake!) Google or TripAdvisor review!\n\n😍If that sounds like something you'd be up for and we can DEPEND on you, let us know and we can work out dates & a half-price booking for you!😍\n\n${FOOTER_LINKS}`;
+            }
+
+            if (unablePreapprove) {
+                if (role === 'art') {
+                    const artWPIntro = `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove, as long as your dates don't conflict with the Full Moon Week dates we listed in our description. So let us know ASAP if you'd be interested in joining us!\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n`;
+                    
+                    if (noFullMoon) return `${artWPIntro}${ART_PURE_BODY}\n\n${BUMMER_LIGHT}\n\n${FOOTER_LINKS}`;
+                    if (hasArtWindow) return `${artWPIntro}${ART_PURE_BODY}\n\n${ART_HYBRID_CLAUSE}${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                    return `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove.\n\nHowever, your stay overlaps with Full Moon Week so there is no time to do art during the party period. If you JUST want to make art, please request dates outside of the following. If you'd like to make art AND help with hostel/party work during Full Moon Week, please request dates that include at least one of the periods below PLUS at least one week before or after those dates to do art!\n\n${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                }
+
+                const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
+                return `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove, as long as you followed the Full Moon Week dates we listed in our description. So let us know ASAP if you'd be interested in joining us!\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+            }
+
+            if ((arrivalBad || departureBad) && !dateOverride) {
+                const part = arrivalBad && departureBad ? "start and end during" : (arrivalBad ? "start during" : "end during");
+                const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
+                let adjustmentText = "If you are able to adjust your dates to include at least one of these periods, we can host you!";
+                if (role === 'art') adjustmentText = "If you are able to adjust your dates to not include one of these periods if you want to ONLY do art, or to include the full period if you want to do hostel/party work also, we can host you!";
+
+                return `${hi} thanks for your request, but you've chosen dates that ${part} a Full Moon Week period, which we can't accommodate. ${adjustmentText}\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+            }
+
+            if (role === 'art') {
+                if (noFullMoon) return `${hi} thanks for your request! ${ART_PURE_BODY}\n\n${BUMMER_LIGHT}\n\n${FOOTER_LINKS}`;
+                if (hasArtWindow) return `${hi} thanks for your request! ${ART_PURE_BODY}\n\n${ART_HYBRID_CLAUSE}${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request, we'd love to have art but your stay overlaps with Full Moon Week so there is no time to do art during the party period. If you JUST want to make art, please request dates outside of the following. If you'd like to make art AND help with hostel/party work during Full Moon Week, please request dates that include at least one of the periods below PLUS at least one week before or after those dates to do art!\n\n${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+            }
+
+            if (noFullMoon && !dateOverride && role !== 'art') {
+                const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
+                return `${hi} thanks for your request, but you've chosen dates that don't include a Full Moon Week period, which we can't accommodate. If you are able to adjust your dates to include at least one of these periods, we can host you!\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+            }
+
+            const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
+            const intro = (role === 'social') ? `thanks for your request! We could use some help with social media, content, promotion, and marketing! We are looking for someone with skills at attracting people online and making sure our on-the-ground promotion team of volunteers are effective and reliable.\n\n` : `thanks for your request! We get tons of requests (apologies for any slow response), so we've made this message about what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n`;
+
+            return `${hi} ${intro}${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+        }
+
+        // ==========================================
+        // VOLUNTEER RESPONDER LOGIC (CONFIRM)
+        // ==========================================
+        function generateVolConfirmResponse() {
+            const { name, role, noFullMoon } = volState;
+            
+            const { bdc_in, bdc_out, agoda_in, hw_in, hw_out } = getConfirmDates();
+
+            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n⛴ Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n➡🏝 TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-phangan/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n🏝➡ TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! 😂 We'll see you soon! 😍`;
+
+            if (role === 'art' && noFullMoon) {
+                return `Thanks for accepting and joining us! Please let us know ASAP if anything changes in your dates. There's a LOT of info in here, please read it carefully and follow instructions, click links, etc., then ask us any unanswered questions!
+
+------------------
+CONFIRMING
+------------------
+As explained, your stay isn't guaranteed until the following is completed:
+
+🚨1) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
+🚨2) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
+🚨3) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${bdc_in}&to=${bdc_out}&guests=1
+
+Remember, EVERYTHING will be REFUNDED at the end of your stay as long as you completed your project.
+
+💬 The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, recommend WET to people, and answer questions about Phangan (ask if you don't know!)
+
+📝 If you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
+
+---------
+CHATS
+---------
+You MUST be active on these 4 groups (but please check all the groups we sent you in our previous message):
+
+💬 https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
+💬 https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
+💬 https://tinyurl.com/FMPChat &
+💬 https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
+
+You should already be following our socials - tag us in your posts and we can give you posting access too.
+https://www.tiktok.com/@wetpoolparty
+https://Instagram.com/WetPoolParty
+https://Instagram.com/WetHostel
+https://Instagram.com/FullMoonWeek
+
+💬 If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
+
+-------------
+ARRIVING
+-------------
+Details on how to get here are below in TRAVEL, but if you get here between Full Moons, it can be very quiet and casual and a bit confusing:
+☛ Message the group chat to say hi!
+☛ Reception should check you in, but they may be running around.
+☛ If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
+☛ Pick an available bed and message the bed # to the group chat.
+☛ Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception. They can get you set up and get the art supplies you need.
+☛ If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
+
+☛ Any problems, tell staff, message the group chat, or message me directly!
+☛ Hang out with staff, guests & each other - we operate as a family!
+☛ There isn't formal work schedule - make art whenever you want, as long as you leave us with something beautiful!
+
+${TRAVEL_CONFIRM}`;
+            }
+
+            return `Thanks for accepting and joining us! Please let us know ASAP if anything changes in your dates. There's a LOT of info in here, please read it carefully and follow instructions, click links, etc., then ask us any unanswered questions!
+
+------------------
+CONFIRMING
+------------------
+As explained, your stay isn't guaranteed until the following is completed:
+
+🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep
+🚨2) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
+🚨3) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
+🚨4) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${hw_in}&to=${hw_out}&guests=1
+
+Remember, EVERYTHING will be REFUNDED after Full Moon Week (bookings in cash, deposit reversed to your card) as long as you show up and do your shifts. Repeatedly not doing shifts can result in penalties.
+
+💬 The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, tell people to party at WET, and answer questions about Full Moon (ask if you don't know!)
+
+📝 After Full Moon, if you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
+
+---------
+CHATS
+---------
+You MUST be active on these 4 groups (but please check all the groups we sent you in our previous message):
+
+💬 https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
+💬 https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
+💬 https://tinyurl.com/FMPChat &
+💬 https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
+
+You should already be following our socials - tag us in your posts and we can give you posting access too.
+https://www.tiktok.com/@wetpoolparty
+https://Instagram.com/WetPoolParty
+https://Instagram.com/WetHostel
+https://Instagram.com/FullMoonWeek
+
+🎉 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!
+
+💬 If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
+
+-------------
+ARRIVING
+-------------
+Details on how to get here are below in TRAVEL, but if you get here between Full Moons, it can be very quiet and casual and a bit confusing:
+☛ Message the group chat to say hi!
+☛ Reception should check you in, but they may be running around.
+☛ If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
+☛ Pick an available bed and message the bed # to the group chat.
+☛ Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception.
+☛ If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
+
+☛ Any problems, tell staff, message the group chat, or message me directly!
+☛ Hang out with staff, guests & each other - we operate as a family!
+☛ There isn't formal work until 4 days before Full Moon, though be active on the group chat in case anything comes up. Relax and enjoy the calm before the party!
+☛ 3 days before Full Moon, we'll have a full volunteer meeting and go over everything!
+☛ Shifts are 5 days - 2 days before Full Moon to 2 days after. DO NOT flake out after Full Moon (we're all tired, but the party must go on!)
+
+${TRAVEL_CONFIRM}`;
+        }
+
+        // ==========================================
+        // REPLY GENERATOR (PRICE QUOTER) LOGIC
+        // ==========================================
+        function updateQuote(field, val) { quoteState[field] = field === 'guestName' ? val : (parseFloat(val) || 0); renderResults(); }
+        function openBookingLink(url) { window.open(url, '_blank'); setTimeout(() => { document.getElementById('tool-paste')?.focus(); }, 200); }
+        function generateBookingLinkHTML() {
+            if (!quoteState.checkinISO || !quoteState.checkoutISO) return `<div class="py-2 text-[10px] text-center text-slate-400 bg-slate-50 border border-dashed rounded opacity-60">No Dates Detected for Link</div>`;
             const url = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${quoteState.checkinISO}&checkout=${quoteState.checkoutISO}&group_adults=${quoteState.guests}&group_children=0&hapos=1&no_rooms=1`;
-            return `<button onclick="openBookingLink('${url}')" class="w-full py-3 bg-blue-600 text-white text-center rounded shadow-sm font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2">🔍 WET Rates: ${quoteState.checkinISO} (${quoteState.nights}n)</button>`;
+            return `<button onclick="openBookingLink('${url}')" class="w-full py-3 bg-blue-600 text-white text-center rounded shadow-sm font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2">🔍 WET Rates: ${quoteState.checkinISO} (${quoteState.nights}n)</button>`;
         }
 
         function runPriceFetcher() {
             const text = document.getElementById('tool-paste').value;
             if (!text) return;
-            const ROOM_MAP = [
-                { id: "female", match: "Female Dormitory" },
-                { id: "budget", match: "Bunk Bed in Mixed Dormitory" },
-                { id: "standard", match: "Single Bed in Mixed Dormitory" },
-                { id: "superior", match: "Single Bed in Dormitory Room" }
-            ];
+            const ROOM_MAP = [ { id: "female", match: "Female Dormitory" }, { id: "budget", match: "Bunk Bed in Mixed Dormitory" }, { id: "standard", match: "Single Bed in Mixed Dormitory" }, { id: "superior", match: "Single Bed in Dormitory Room" } ];
             const cleanText = text.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ").replace(/\s+/g, ' ');
             ROOM_MAP.forEach(room => {
                 const regex = new RegExp(room.match.replace(/\s+/g, '\\s+'), 'gi');
-                let match;
-                let foundPrices = [];
+                let match; let foundPrices = [];
                 while ((match = regex.exec(cleanText)) !== null) {
                     const chunk = cleanText.substring(match.index, match.index + 1200);
                     const priceMatches = [...chunk.matchAll(/THB\s*([\d,.]+)/gi)];
@@ -298,8 +756,7 @@
                 }
                 if (foundPrices.length > 0) quoteState[room.id] = Math.min(...foundPrices);
             });
-            document.getElementById('tool-paste').value = '';
-            renderResults(); 
+            document.getElementById('tool-paste').value = ''; renderResults(); 
         }
 
         function generateReplyString() {
@@ -307,116 +764,151 @@
             const s = (count, single, plural) => parseInt(count) === 1 ? single : plural;
             const privateCalc = (price, cap) => {
                 if (!price) return "0";
-                let res = 0;
-                if (cap === 4) {
-                    if (g === 4) res = 4 * price;
-                    else if (g < 4) res = Math.round(3.9 * price);
-                    else if (g === 6) res = 6 * price;
-                    else if (g < 6) res = Math.round(5.75 * price);
-                    else if (g === 8) res = 8 * price;
-                    else if (g < 8) res = Math.round(7.75 * price);
-                } else if (cap === 6) {
-                    if (g === 6) res = 6 * price;
-                    else if (g < 6) res = Math.round(5.75 * price);
-                    else if (g === 8) res = 8 * price;
-                    else if (g < 8) res = Math.round(7.75 * price);
-                } else if (cap === 8) {
-                    if (g === 8) res = 8 * price;
-                    else if (g < 8) res = Math.round(7.75 * price);
-                }
-                return res ? f(res) : "N/A";
+                let res = 0; if (cap === 4) res = (g===4?4:(g<4?3.9:(g===6?6:(g<6?5.75:(g===8?8:7.75)))))*price;
+                else if (cap === 6) res = (g===6?6:(g<6?5.75:(g===8?8:7.75)))*price;
+                else if (cap === 8) res = (g===8?8:7.75)*price;
+                return res ? f(Math.round(res)) : "N/A";
             };
-            const formatDormLine = (label, rate, extra) => {
-                if (parseInt(g) === 1) return `${label}: ${f(rate)} baht total, extra nights are ${f(extra)} baht per person per night.`;
-                return `${label}: ${f(rate)} baht - ${f(g * rate)} total, extra nights are ${f(extra)} baht per person per night.`;
-            };
-            const introLine = `Hi ${guestName}! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are currently available.`;
-            const staticInfo = `฿🇹🇭 All prices are in Thai baht for the total stay. Dorm prices are per person, and private room prices are for the whole room.\n\n⛔ AirBnB can't calculate more than one bed or handle groups, upgrades, or special requests, so we do our best to quote full details you can find about WETPoolParty.\n\n--------------------\n💦Our Pool Party hostel is a 3-minute walk from Full Moon Party beach and has a private fenced compound featuring a garden area and a large pool with a swim-up bar, raised DJ booth, games, and more. A great place to hang out and party, with chillouts and special events and parties. We have all dorms:\n\n* 💲BUDGET dorm - 4-10 beds, aircon, shared bathroom, louder area.\n* 🚺FEMALE-only dorm - 8 beds, aircon, ensuite bathrooms, quieter area.\n* 🚻STANDARD dorm - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.\n* 🛅SUPERIOR dorm - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.\n\n--------------------\n🛌POOL HOSTEL BEDS:\n${formatDormLine('BUDGET Dorm', b, exBudgetBed)}\n${formatDormLine('STANDARD Dorm', sRate, exStandBed)}\n${formatDormLine('SUPERIOR Dorm', sup, exSuperBed)}\n${formatDormLine('FEMALE Dorm', fem, exFemBed)}\n\n\n🏩POOL HOSTEL DORMS FOR PRIVATE USE:\nBUDGET Dorm: ${privateCalc(b, 4)} baht, extra nights ${f(exBudgetPriv)} baht per night.\nSTANDARD Dorm: ${privateCalc(sRate, 6)} baht, extra nights ${f(exStandPriv)} baht per night.\nSUPERIOR Dorm: ${privateCalc(sup, 6)} baht, extra nights ${f(exSuperPriv)} baht per night.\nFEMALE Dorm: ${privateCalc(fem, 8)} baht, extra nights ${f(exFemPriv)} baht per night.\n\n\n--------------------\n🚨Please let us know if you would like us to book one of these options as we often sell out!`;
-            const moonWarning = `📢Many people don't realize that 🌕FULL MOON PARTY🌕 is a weeklong event with at least FIVE nights of all-night parties. Our pool party hostel hosts preparties every day from 2 days before Full Moon night to 2 days after and the pool & bar are open 24 hours during Full Moon week.\n\n🔗Check out @FullMoonWeek on IG for an idea of all the parties!\n\n🎉The usual line-up (not including many other parties with changing dates like OXA Party (Fridays), Eden, Seaside & Hollystone (Saturdays), Bambu & Sinewave DnB at ChillUp (Sundays) Monday Madness at ChillUp, Big Splash DnB (Tuesdays), Lighthouse & Psyday at ChillUp (Tuesdays & Fridays), Retro Mountain, Chill Up, Stona, etc.) is:\n\n2⃣ DAYS BEFORE: Waterfall Party, Utopia, 5-day WET Pool Party preparty\n1⃣ DAY BEFORE: Jungle Experience, WET preparty\n🌕FULL MOON PARTY🌕 24 hours\n1⃣ DAY AFTER: WET FOAM Party\n2⃣ DAYS AFTER: Waterfall Party, WET preparty\n\n🚨If you're not booking for at least 3 or 4 of the 5-day event, we HIGHLY recommend you extend. We offer super-cheap extension rates. Just let us know!`;
-            return `${introLine}\n\n${staticInfo}\n\n${n < 3 ? moonWarning : '😍'}`;
+            const formatDormLine = (label, rate, extra) => parseInt(g) === 1 ? `${label}: ${f(rate)} baht total, extra nights are ${f(extra)} baht per person per night.` : `${label}: ${f(rate)} baht - ${f(g * rate)} total, extra nights are ${f(extra)} baht per person per night.`;
+            return `Hi ${guestName}! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.\n\n฿🇹🇭 All prices in THB. Dorms are per person, private is whole room.\n\n🛌POOL HOSTEL BEDS:\n${formatDormLine('BUDGET Dorm', b, exBudgetBed)}\n${formatDormLine('STANDARD Dorm', sRate, exStandBed)}\n${formatDormLine('SUPERIOR Dorm', sup, exSuperBed)}\n${formatDormLine('FEMALE Dorm', fem, exFemBed)}\n\n🏩DORMS FOR PRIVATE USE:\nBUDGET: ${privateCalc(b, 4)} baht | STANDARD: ${privateCalc(sRate, 6)} baht | SUPERIOR: ${privateCalc(sup, 6)} baht | FEMALE: ${privateCalc(fem, 8)} baht\n\n--------------------\n🚨Please let us know if you would like us to book one of these options as we often sell out!`;
         }
 
+        // ==========================================
+        // UI RENDERING
+        // ==========================================
         function renderResults() {
-            const view = document.getElementById('results-view');
-            const empty = document.getElementById('empty-state');
-            const title = document.getElementById('app-title');
-            if (!lastParsedData && viewMode !== 'reply') { view.classList.add('hidden'); empty.classList.remove('hidden'); title.innerText = "WET Parser 6.1"; return; }
+            const view = document.getElementById('results-view'); const empty = document.getElementById('empty-state');
+            if (!lastParsedData && viewMode !== 'vol-request' && viewMode !== 'vol-confirm' && viewMode !== 'reply') { view.classList.add('hidden'); empty.classList.remove('hidden'); return; }
             view.classList.remove('hidden'); empty.classList.add('hidden');
-            if (viewMode === 'reply') { title.innerText = "Reply Generator"; renderReplyView(view); }
-            else if (lastParsedData && lastParsedData.type === 'card') { title.innerText = "Card Secure-Parse"; renderCardView(view); }
-            else if (lastParsedData) {
-                title.innerText = lastParsedData.type === 'booking' ? "Booking.com Parser" : "Airbnb Parser";
-                if (viewMode === 'block') renderBlockView(view); else renderFieldsView(view);
-            }
+            
+            if (viewMode === 'vol-request' || viewMode === 'vol-confirm') renderVolunteerView(view);
+            else if (viewMode === 'reply') renderReplyView(view);
+            else if (lastParsedData && lastParsedData.type === 'card') renderCardView(view);
+            else renderFieldsView(view);
         }
 
-        function renderCardView(el) {
-            el.innerHTML = `<div class="p-3 flex flex-col gap-3"><div class="bg-red-50 border border-red-200 p-6 rounded text-center shadow-sm"><pre class="text-[19px] font-bold text-slate-900 whitespace-pre-wrap text-left">${lastParsedData.block}</pre></div><button onclick="copyToClipboard(lastParsedData.block, 'CARD')" id="status-CARD" class="w-full py-6 bg-red-600 text-white font-bold rounded shadow-lg hover:bg-red-700 text-lg uppercase tracking-tight">COPY BLOCK</button></div>`;
+        function renderVolunteerView(el) {
+            const isConfirm = viewMode === 'vol-confirm';
+            const hasProblem = (volState.arrivalBad || volState.departureBad || (volState.noFullMoon && volState.role !== 'art') || (volState.role === 'art' && !volState.noFullMoon && !volState.hasArtWindow)) && !volState.dateOverride;
+            
+            el.innerHTML = `
+                <div class="flex-1 p-2 flex flex-col gap-2">
+                    <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Applicant</span>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-sm font-bold text-slate-800">${volState.name || 'Hi,'}</span>
+                                    <div class="flex bg-white rounded border border-indigo-200 overflow-hidden shadow-sm">
+                                        <button onclick="updateVol('role', 'standard')" class="px-2 py-0.5 text-[9px] font-black tracking-widest transition-colors ${volState.role === 'standard' ? 'bg-indigo-500 text-white' : 'text-slate-500 hover:bg-slate-50'}">STD</button>
+                                        <button onclick="updateVol('role', 'social')" class="px-2 py-0.5 text-[9px] font-black tracking-widest border-l border-indigo-200 transition-colors ${volState.role === 'social' ? 'bg-indigo-500 text-white' : 'text-slate-500 hover:bg-slate-50'}">SOC</button>
+                                        <button onclick="updateVol('role', 'art')" class="px-2 py-0.5 text-[9px] font-black tracking-widest border-l border-indigo-200 transition-colors ${volState.role === 'art' ? 'bg-indigo-500 text-white' : 'text-slate-500 hover:bg-slate-50'}">ART</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right"><span class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Status</span><div class="text-[10px] font-bold ${hasProblem ? 'text-red-500' : 'text-green-600'}">${hasProblem ? '❌ DATES BAD' : '✅ DATES OK'}</div></div>
+                        </div>
+                        
+                        ${!isConfirm ? `
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-2 pt-2 border-t border-indigo-100">
+                            <div class="flex items-center justify-between"><span class="text-[11px] font-bold text-slate-600">Full?</span><label class="switch"><input type="checkbox" ${volState.fullyBooked ? 'checked' : ''} onchange="updateVol('fullyBooked', this.checked)"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between"><span class="text-[11px] font-bold text-slate-600">Discount?</span><label class="switch"><input type="checkbox" ${volState.discountStay ? 'checked' : ''} onchange="updateVol('discountStay', this.checked)"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between"><span class="text-[11px] font-bold text-slate-600 tracking-tight">Can't Preapprove?</span><label class="switch"><input type="checkbox" ${volState.unablePreapprove ? 'checked' : ''} onchange="updateVol('unablePreapprove', this.checked)"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between"><span class="text-[11px] font-bold text-slate-600">Override?</span><label class="switch"><input type="checkbox" ${volState.dateOverride ? 'checked' : ''} onchange="updateVol('dateOverride', this.checked)"><span class="slider"></span></label></div>
+                        </div>` : `
+                        <div class="mt-2 pt-2 border-t border-indigo-100 flex flex-col gap-1">
+                            <div class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest text-center">
+                                GENERATING CONFIRMATION FOR ${volState.role === 'art' && volState.noFullMoon ? 'PURE ART (NO DEPOSIT)' : 'STANDARD FMW (WITH DEPOSIT)'}
+                            </div>
+                            ${(!volState.startDate || !volState.endDate) ? `<div class="text-[10px] font-bold text-red-500 text-center uppercase tracking-widest">⚠️ NO VALID DATES DETECTED - USING PLACEHOLDERS ⚠️</div>` : ''}
+                        </div>
+                        `}
+                    </div>
+                    <textarea id="vol-response-text" class="flex-1 min-h-[300px] w-full p-4 bg-white border border-slate-300 rounded text-[13px] leading-snug focus:outline-none custom-scrollbar" spellcheck="false">${isConfirm ? generateVolConfirmResponse() : generateVolResponse()}</textarea>
+                    <button onclick="copyToClipboard(document.getElementById('vol-response-text').value, 'VOL')" id="status-VOL" class="w-full py-4 ${isConfirm ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold rounded shadow-lg text-lg uppercase flex items-center justify-center gap-2 transition-all">COPY ${isConfirm ? 'CONFIRMATION' : 'RESPONSE'}</button>
+                </div>`;
         }
 
         function renderReplyView(el) {
             const { guestName, guests, nights, budget, standard, superior, female, exBudgetBed, exStandBed, exSuperBed, exFemBed, exBudgetPriv, exStandPriv, exSuperPriv, exFemPriv, extraNightsOpen } = quoteState;
-            el.innerHTML = `<div class="flex-1 p-2 flex flex-col gap-2">
-                <div class="bg-indigo-50 border border-indigo-200 p-3 rounded shadow-sm space-y-3">
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase">Guest Name</label><input type="text" onchange="updateQuote('guestName', this.value)" value="${guestName}" class="p-2 border rounded font-semibold text-sm"></div>
-                        <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase">Guests</label><input type="number" onchange="updateQuote('guests', this.value)" value="${guests}" class="p-2 border rounded font-semibold text-sm text-center"></div>
-                        <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase">Nights</label><input type="number" onchange="updateQuote('nights', this.value)" value="${nights}" class="p-2 border rounded font-semibold text-sm text-center"></div>
-                    </div>
-                    
-                    <div class="space-y-1">
-                        <div id="booking-link-container">${generateBookingLinkHTML()}</div>
-                        <div class="flex gap-1">
-                            <textarea id="tool-paste" rows="1" placeholder="Paste Booking.com page content here..." class="flex-1 bg-white border border-blue-200 rounded p-2 focus:outline-none focus:ring-1 focus:ring-blue-400"></textarea>
-                            <button onclick="runPriceFetcher()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 rounded uppercase text-[10px] tracking-tighter transition-colors">Extract Prices</button>
+            el.innerHTML = `
+                <div class="flex-1 p-2 flex flex-col gap-2">
+                    <div class="bg-indigo-50 border border-indigo-200 p-3 rounded shadow-sm space-y-3">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase">Guest Name</label><input type="text" onchange="updateQuote('guestName', this.value)" value="${guestName}" class="p-2 border rounded font-semibold text-sm"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase">Guests</label><input type="number" onchange="updateQuote('guests', this.value)" value="${guests}" class="p-2 border rounded font-semibold text-sm text-center"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase">Nights</label><input type="number" onchange="updateQuote('nights', this.value)" value="${nights}" class="p-2 border rounded font-semibold text-sm text-center"></div>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-4 gap-2 pt-1 border-t border-indigo-100">
-                        <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase text-center">Budget</label><input type="number" onchange="updateQuote('budget', this.value)" value="${budget||''}" class="p-2 border rounded text-sm text-center"></div>
-                        <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase text-center">Standard</label><input type="number" onchange="updateQuote('standard', this.value)" value="${standard||''}" class="p-2 border rounded text-sm text-center"></div>
-                        <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase text-center">Superior</label><input type="number" onchange="updateQuote('superior', this.value)" value="${superior||''}" class="p-2 border rounded text-sm text-center"></div>
-                        <div class="flex flex-col"><label class="text-[9px] font-bold text-indigo-400 uppercase text-center">Female</label><input type="number" onchange="updateQuote('female', this.value)" value="${female||''}" class="p-2 border rounded text-sm text-center"></div>
-                    </div>
-                    
-                    <details class="group" ${extraNightsOpen ? 'open' : ''} ontoggle="quoteState.extraNightsOpen = this.open">
-                        <summary class="text-[10px] font-bold text-indigo-600 cursor-pointer uppercase tracking-tighter">Edit Extra Night Rates ↓</summary>
-                        <div class="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-indigo-200">
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Bud</label><input type="number" onchange="updateQuote('exBudgetBed', this.value)" value="${exBudgetBed}" class="p-1 border rounded text-[10px]"></div>
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Std</label><input type="number" onchange="updateQuote('exStandBed', this.value)" value="${exStandBed}" class="p-1 border rounded text-[10px]"></div>
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Sup</label><input type="number" onchange="updateQuote('exSuperBed', this.value)" value="${exSuperBed}" class="p-1 border rounded text-[10px]"></div>
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Fem</label><input type="number" onchange="updateQuote('exFemBed', this.value)" value="${exFemBed}" class="p-1 border rounded text-[10px]"></div>
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Bud</label><input type="number" onchange="updateQuote('exBudgetPriv', this.value)" value="${exBudgetPriv}" class="p-1 border rounded text-[10px]"></div>
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Std</label><input type="number" onchange="updateQuote('exStandPriv', this.value)" value="${exStandPriv}" class="p-1 border rounded text-[10px]"></div>
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Sup</label><input type="number" onchange="updateQuote('exSuperPriv', this.value)" value="${exSuperPriv}" class="p-1 border rounded text-[10px]"></div>
-                            <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Fem</label><input type="number" onchange="updateQuote('exFemPriv', this.value)" value="${exFemPriv}" class="p-1 border rounded text-[10px]"></div>
+                        <div class="space-y-1">
+                            <div id="booking-link-container">${generateBookingLinkHTML()}</div>
+                            <div class="flex gap-1">
+                                <textarea id="tool-paste" rows="1" placeholder="Paste Booking.com page content here..." class="flex-1 bg-white border border-blue-200 rounded p-2 focus:outline-none focus:ring-1 focus:ring-blue-400"></textarea>
+                                <button onclick="runPriceFetcher()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 rounded uppercase text-[10px] tracking-tighter">Extract</button>
+                            </div>
                         </div>
-                    </details>
-                </div>
-                <textarea id="reply-text" class="flex-1 min-h-[300px] w-full p-4 bg-white border border-slate-300 rounded text-[14px] leading-snug focus:outline-none custom-scrollbar" spellcheck="false">${generateReplyString()}</textarea>
-                <button onclick="copyToClipboard(document.getElementById('reply-text').value, 'REPLY')" id="status-REPLY" class="w-full py-4 bg-indigo-600 text-white font-bold rounded shadow-lg text-lg uppercase flex items-center justify-center gap-2 transition-all hover:bg-indigo-700"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>COPY REPLY</button>
-            </div>`;
+                        <div class="grid grid-cols-4 gap-2 pt-1 border-t border-indigo-100">
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase text-center">Budget</label><input type="number" onchange="updateQuote('budget', this.value)" value="${budget||''}" class="p-2 border rounded text-sm text-center"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase text-center">Standard</label><input type="number" onchange="updateQuote('standard', this.value)" value="${standard||''}" class="p-2 border rounded text-sm text-center"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase text-center">Superior</label><input type="number" onchange="updateQuote('superior', this.value)" value="${superior||''}" class="p-2 border rounded text-sm text-center"></div>
+                            <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase text-center">Female</label><input type="number" onchange="updateQuote('female', this.value)" value="${female||''}" class="p-2 border rounded text-sm text-center"></div>
+                        </div>
+                        <details class="group" ${extraNightsOpen ? 'open' : ''} ontoggle="quoteState.extraNightsOpen = this.open">
+                            <summary class="text-[10px] font-bold text-indigo-600 cursor-pointer uppercase tracking-tighter">Edit Extra Night Rates ↓</summary>
+                            <div class="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-indigo-200">
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Bud</label><input type="number" onchange="updateQuote('exBudgetBed', this.value)" value="${exBudgetBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Std</label><input type="number" onchange="updateQuote('exStandBed', this.value)" value="${exStandBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Sup</label><input type="number" onchange="updateQuote('exSuperBed', this.value)" value="${exSuperBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Fem</label><input type="number" onchange="updateQuote('exFemBed', this.value)" value="${exFemBed}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Bud</label><input type="number" onchange="updateQuote('exBudgetPriv', this.value)" value="${exBudgetPriv}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Std</label><input type="number" onchange="updateQuote('exStandPriv', this.value)" value="${exStandPriv}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Sup</label><input type="number" onchange="updateQuote('exSuperPriv', this.value)" value="${exSuperPriv}" class="p-1 border rounded text-[10px]"></div>
+                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Fem</label><input type="number" onchange="updateQuote('exFemPriv', this.value)" value="${exFemPriv}" class="p-1 border rounded text-[10px]"></div>
+                            </div>
+                        </details>
+                    </div>
+                    <textarea id="reply-text" class="flex-1 min-h-[300px] w-full p-4 bg-white border border-slate-300 rounded text-[14px] leading-snug focus:outline-none custom-scrollbar" spellcheck="false">${generateReplyString()}</textarea>
+                    <button onclick="copyToClipboard(document.getElementById('reply-text').value, 'REPLY')" id="status-REPLY" class="w-full py-4 bg-indigo-600 text-white font-bold rounded shadow-lg text-lg uppercase transition-all hover:bg-indigo-700">COPY QUOTE</button>
+                </div>`;
         }
 
-        function renderBlockView(el) {
-            const fullText = `${lastParsedData.firstName} ${lastParsedData.lastName}\n${lastParsedData.phone}\n${lastParsedData.email}\n\nTOTAL: ${lastParsedData.totalPrice}\nPAYOUT: ${lastParsedData.payout}\n\n${lastParsedData.otherDetails}`;
-            el.innerHTML = `<div class="h-full flex flex-col p-1"><pre class="flex-1 p-4 bg-slate-50 border border-slate-300 rounded text-[15px] leading-relaxed overflow-auto font-semibold text-slate-800 text-left text-left text-left text-left text-left">${fullText}</pre><button onclick="copyToClipboard(\`${fullText}\`, 'FULL')" id="status-FULL" class="mt-2 w-full py-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 uppercase text-sm shadow-md transition-all">COPY FULL SUMMARY</button></div>`;
+        function renderCardView(el) {
+            el.innerHTML = `
+                <div class="p-3 flex flex-col gap-3">
+                    <div class="bg-red-50 border border-red-200 p-6 rounded text-center shadow-sm">
+                        <pre class="text-[19px] font-bold text-slate-900 whitespace-pre-wrap text-left">${lastParsedData.block}</pre>
+                    </div>
+                    <button onclick="copyToClipboard(lastParsedData.block, 'CARD')" id="status-CARD" class="w-full py-6 bg-red-600 text-white font-bold rounded shadow-lg hover:bg-red-700 text-lg uppercase tracking-tight">COPY BLOCK</button>
+                </div>`;
         }
 
         function renderFieldsView(el) {
-            el.innerHTML = `<div class="flex-1 flex flex-col p-2 gap-1.5 overflow-y-auto"><div class="grid grid-cols-2 gap-1.5"><div onclick="copyToClipboard(lastParsedData.firstName, 'FNAME')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-FNAME">FIRST NAME</span><span class="text-[16px] font-bold">${lastParsedData.firstName || '---'}</span></div><div onclick="copyToClipboard(lastParsedData.lastName, 'LNAME')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-LNAME">LAST NAME</span><span class="text-[16px] font-bold">${lastParsedData.lastName || '---'}</span></div></div><div class="grid grid-cols-2 gap-1.5"><div onclick="copyToClipboard(lastParsedData.city, 'CITY')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-CITY">CITY</span><span class="text-[16px] font-bold">${lastParsedData.city || '---'}</span></div><div onclick="copyToClipboard(lastParsedData.country, 'COUNTRY')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-COUNTRY">COUNTRY</span><span class="text-[16px] font-bold">${lastParsedData.country || '---'}</span></div></div><div onclick="copyToClipboard(lastParsedData.email, 'EMAIL')" class="bg-white border border-slate-300 p-2 rounded shadow-sm cursor-pointer"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-EMAIL">EMAIL</span><span class="text-[16px] font-bold">${lastParsedData.email || '---'}</span></div><div onclick="copyToClipboard(lastParsedData.phone, 'PHONE')" class="bg-white border border-slate-300 p-2 rounded shadow-sm cursor-pointer"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-PHONE">PHONE</span><span class="text-[16px] font-bold">${lastParsedData.phone || '---'}</span></div><div class="mt-1 p-2 bg-blue-50 border border-blue-200 rounded space-y-1.5 shadow-sm"><div onclick="copyToClipboard(lastParsedData.totalPrice, 'TOTAL')" class="flex justify-between items-center cursor-pointer border-b border-blue-100 pb-1"><span class="text-[10px] font-bold text-blue-400 uppercase">Total Price</span><span class="text-[16px] font-bold">${lastParsedData.totalPrice}</span></div><div onclick="copyToClipboard(lastParsedData.commission, 'FEE_VAL')" class="flex justify-between items-center cursor-pointer border-b border-blue-100 pb-1"><span class="text-[10px] font-bold text-blue-400 uppercase">Fee</span><span class="text-[16px] font-bold">${lastParsedData.commission || '฿0'}</span></div><div onclick="copyToClipboard(lastParsedData.payout, 'PAYOUT')" class="flex justify-between items-center cursor-pointer pt-0.5"><span class="text-[10px] font-bold text-blue-600 uppercase">Net Payout</span><span class="text-[18px] font-black text-blue-700">${lastParsedData.payout}</span></div></div><div class="mt-auto pt-2"><div class="flex justify-between items-center bg-slate-200 px-3 py-1.5 rounded-t border-x border-t border-slate-300"><span class="font-bold text-[10px] text-slate-500 uppercase tracking-widest">NOTES BLOCK</span><button onclick="copyToClipboard(lastParsedData.otherDetails, 'OTHER')" id="status-OTHER" class="px-3 py-1 rounded font-bold text-[10px] bg-slate-400 text-white uppercase transition-all">COPY</button></div><pre class="bg-white border border-slate-300 p-3 rounded-b text-[15px] whitespace-pre-wrap leading-tight text-left text-left text-left text-left text-left text-left text-slate-700 font-bold">${lastParsedData.otherDetails}</pre></div></div>`;
+            el.innerHTML = `
+                <div class="flex-1 flex flex-col p-2 gap-1.5 overflow-y-auto">
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <div onclick="copyToClipboard(lastParsedData.firstName, 'FNAME')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-FNAME">FIRST NAME</span><span class="text-[16px] font-bold">${lastParsedData.firstName || '---'}</span></div>
+                        <div onclick="copyToClipboard(lastParsedData.lastName, 'LNAME')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-LNAME">LAST NAME</span><span class="text-[16px] font-bold">${lastParsedData.lastName || '---'}</span></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <div onclick="copyToClipboard(lastParsedData.city, 'CITY')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-CITY">CITY</span><span class="text-[16px] font-bold">${lastParsedData.city || '---'}</span></div>
+                        <div onclick="copyToClipboard(lastParsedData.country, 'COUNTRY')" class="bg-white border border-slate-300 p-2 rounded shadow-sm hover:border-slate-400 cursor-pointer relative"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-COUNTRY">STATE / COUNTRY</span><span class="text-[16px] font-bold">${lastParsedData.country || '---'}</span></div>
+                    </div>
+                    <div onclick="copyToClipboard(lastParsedData.email, 'EMAIL')" class="bg-white border border-slate-300 p-2 rounded shadow-sm cursor-pointer"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-EMAIL">EMAIL</span><span class="text-[16px] font-bold">${lastParsedData.email || '---'}</span></div>
+                    <div onclick="copyToClipboard(lastParsedData.phone, 'PHONE')" class="bg-white border border-slate-300 p-2 rounded shadow-sm cursor-pointer"><span class="text-[10px] text-slate-400 font-bold block uppercase" id="status-PHONE">PHONE</span><span class="text-[16px] font-bold">${lastParsedData.phone || '---'}</span></div>
+                    <div class="mt-1 p-2 bg-blue-50 border border-blue-200 rounded space-y-1.5 shadow-sm">
+                        <div onclick="copyToClipboard(lastParsedData.totalPrice, 'TOTAL')" class="flex justify-between items-center cursor-pointer border-b border-blue-100 pb-1"><span class="text-[10px] font-bold text-blue-400 uppercase">Total Price</span><span class="text-[16px] font-bold">${lastParsedData.totalPrice}</span></div>
+                        <div onclick="copyToClipboard(lastParsedData.commission, 'FEE_VAL')" class="flex justify-between items-center cursor-pointer border-b border-blue-100 pb-1"><span class="text-[10px] font-bold text-blue-400 uppercase">Fee</span><span class="text-[16px] font-bold">${lastParsedData.commission || '฿0'}</span></div>
+                        <div onclick="copyToClipboard(lastParsedData.payout, 'PAYOUT')" class="flex justify-between items-center cursor-pointer pt-0.5"><span class="text-[10px] font-bold text-blue-600 uppercase">Net Payout</span><span class="text-[18px] font-black text-blue-700">${lastParsedData.payout}</span></div>
+                    </div>
+                    <div class="mt-auto pt-2">
+                        <div class="flex justify-between items-center bg-slate-200 px-3 py-1.5 rounded-t border-x border-t border-slate-300"><span class="font-bold text-[10px] text-slate-500 uppercase tracking-widest">NOTES BLOCK</span><button onclick="copyToClipboard(lastParsedData.otherDetails, 'OTHER')" id="status-OTHER" class="px-3 py-1 rounded font-bold text-[10px] bg-slate-400 text-white uppercase transition-all">COPY</button></div>
+                        <pre class="bg-white border border-slate-300 p-3 rounded-b text-[15px] whitespace-pre-wrap leading-tight text-left text-slate-700 font-bold">${lastParsedData.otherDetails}</pre>
+                    </div>
+                </div>`;
         }
 
         function copyToClipboard(text, id) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text; document.body.appendChild(textArea); textArea.select();
-            try { document.execCommand('copy'); showCopiedFeedback(id); } catch (err) {}
-            document.body.removeChild(textArea);
-        }
-
-        function showCopiedFeedback(id) {
-            const el = document.getElementById(`status-${id}`);
-            if (el) { const original = el.innerText; el.innerText = 'COPIED'; el.classList.replace('text-slate-400', 'text-green-600'); setTimeout(() => { el.innerText = original; el.classList.replace('text-green-600', 'text-slate-400'); }, 1500); }
+            const textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
+            const btn = document.getElementById(`status-${id}`); if (btn) { btn.innerText = "COPIED!"; setTimeout(() => { if(btn) btn.innerText = "COPY"; if(id==='VOL') btn.innerText = document.getElementById('btn-vol-confirm').classList.contains('text-indigo-600') ? "COPY CONFIRMATION" : "COPY RESPONSE"; if(id==='REPLY') btn.innerText = "COPY QUOTE"; if(id==='CARD') btn.innerText = "COPY BLOCK"; }, 1500); }
         }
     </script>
     <script src="https://loren-6q.github.io/WETNav/nav.js"></script>
