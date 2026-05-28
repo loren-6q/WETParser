@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WET Parser v10.12</title>
+    <title>WET Parser v10.18</title>
     <!-- Custom Hardcoded Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,7 +31,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-300 px-4 py-3 rounded shadow-sm gap-4">
             <div class="flex items-center gap-2">
                 <span id="header-icon" class="text-xl">🚀</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.12</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.18</span>
                 <button onclick="openDateModal()" class="ml-2 text-slate-400 hover:text-indigo-600 transition-colors" title="Edit Full Moon Dates">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </button>
@@ -103,9 +103,9 @@
         let lastParsedData = null;
         
         let quoteState = {
-            guestName: 'Guest', guests: 1, nights: 1, budget: 0, standard: 0, superior: 0, female: 0,
+            guestName: 'Guest', guests: 2, nights: 2, budget: 0, standard: 0, superior: 0, female: 0,
             exBudgetBed: 199, exStandBed: 250, exSuperBed: 299, exFemBed: 199,
-            exBudgetPriv: 1599, exStandPriv: 1999, exSuperPriv: 2399, exFemPriv: 1599,
+            exBudgetPriv: 799, exStandPriv: 1599, exSuperPriv: 1799, exFemPriv: 1599,
             extraNightsOpen: false, checkinISO: '', checkoutISO: ''
         };
 
@@ -174,7 +174,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                             if (pIso) partyStarts.push(pIso);
                         }
                     });
-                    if(partyStarts.length === 0) partyStarts.push(start); // fallback
+                    if(partyStarts.length === 0) partyStarts.push(start); 
                     
                     ranges.push({ month, start, end, rangeStr, fullStr, partyStarts });
                 }
@@ -191,7 +191,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                 FMW_RANGES = parseDatesText(DEFAULT_DATES_TEXT);
             }
         }
-        initDates(); // Call immediately
+        initDates(); 
 
         function openDateModal() {
             const stored = localStorage.getItem('fmw_dates_raw') || DEFAULT_DATES_TEXT;
@@ -205,7 +205,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             localStorage.setItem('fmw_dates_raw', val);
             initDates();
             closeDateModal();
-            handleInput(); // Re-parse everything with new dates
+            handleInput(); 
         }
 
         function getLocalDateString(dateObj) {
@@ -232,13 +232,13 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
 
         const ART_PURE_BODY = `We are always looking for great art and we'd love to see what you can do! Art volunteering is very freeform and flexible!\n\nWe like to let artists be artists, so YOU choose what you'd like to create and where! Staff will support with supplies and help, but YOU set your project and schedule! (Just make sure you get it done before you go, and leave your @tag so people can follow you!)\n\nHaad Rin is VERY quiet between Full Moon Weeks, so, while staff and a few guests and volunteers will be around, NO babysitting or regulating. You are on your own to explore the island(s) and work when you please. We don't care if it's 4am each night, or make a mural in 3 days and take a week off... Just leave us with something beautiful!`;
         const ART_HYBRID_CLAUSE = `BUT, your stay includes Full Moon Week dates. During that time there's NO time for art and if you stay with us, you'll be doing hostel & party work for those 5 or 6 days. \n\nIf you DO NOT want to do that, please let us know and change your dates to NOT include these dates:\n\n${getCalendarText('simple')}\n\nIf you DO want to join in the Full Moon Week volunteering, we'll include all the details below:\n\n`;
-        const STANDARD_TASKS_BODY = `------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes! Your tasks include:\n\n🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n🎱 Games: run TOURNAMENTS and share promos so guests have FUN\n📸 Social Media: make IG & TIKTOK content, get others to TAG us, be ACTIVE in chats.\n🍺 Bars: Help our bartenders (no skills needed).\n🛟 Floater: literally just BE THERE and ready to help\n\nWe require just 🗓5 LONG DAYS of work PER MONTH🗓 - 95% free time as long as you want before & after. It's very quiet in town between Full Moons, but you can chill or explore the islands. We're not gonna babysit or give you busywork; just be active in the staff chat.\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍`;
+        const STANDARD_TASKS_BODY = `------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes! Your tasks include:\n\n🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n🎱 Games: run TOURNAMENTS and share promos so guests have FUN\n📸 Social Media: make IG & TIKTOK content, get others to TAG us, be ACTIVE in chats.\n🍺 Bars: Help our bartenders (no skills needed).\n\nWe require just 🗓5 LONG DAYS of work PER MONTH🗓 - 95% free time as long as you want before & after. It's very quiet in town between Full Moons, but you can chill or explore the islands. We're not gonna babysit or give you busywork; just be active in the staff chat.\n\nINCLUDED: \n\ud83d\udecf Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n\ud83d\udef5 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍`;
         
-        const SOCIAL_TASKS_BODY = `------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes! Here are the job tasks:\n\n----------------------------------\n💬 GROUPS & CHATS 💬\n----------------------------------\n🎉 Online promotion is VITAL - the MORE people recommending WET (Hostel & Parties), the bigger and better our party is! We are the #1 preparty for major events and our 🎟Discount Ticket Packages are the best deal. Plus we do nightly group meetups with 🥃free shots, so if people know about it, they will join!\n\n💬 We'll send you a list of groups to join and be active in. If you know others - especially for different demographics (like German, LGBTQ, Solo Travel, etc) - please share!\n\nPeople are posting everywhere asking advice about parties, tickets, meetups, hostels, etc. and we want to be a helpful source of info that favors WET, not just an annoying ad spammer! Volunteers need to check groups & chats daily to answer questions (or ask/tag me if you don't know) and recommend WET to everyone and build hype!\n\n--------------------------------------\n💬 INSTAGRAM & TIKTOK 💬\n--------------------------------------\n📸 Between Full Moons, post IG stories AND Feed/Reel posts several times a week. (Without organic content, it's just a wall of event flyers!) During Full Moon Week we want to post TONS of content.\n🎥 Post as often as possible on TikTok (it's newer & smaller).\n✂ Edit content for now & future. We have a content archive you can use & we need you to leave us with more content for it.\n📂Between Full Moons, spend some time organizing that content archive.\n📤 Send us raw content before you leave for future use.\n#️⃣ Get others to tag us (free shot - you can join them too!) & tag them in our posts! Also ask for a review on Google and TripAdvisor for more free shots!\n\n----------------------------------\n📢 GROUND PROMO 📢\n----------------------------------\n👀We ask you to be our eyes & ears making sure volunteer promo shifts are out engaging with guests all day. The WET group chats are useful for this - volunteers send pics out promoting; games shifts post to gather tournament players; and all volunteers need to be checking their phones regularly to be active in our work chat and promoting in groups/chats.\n\nOur Promotion Volunteer checks hourly that promo & games are active, reminding them to post activity announcements. Any creative input to improve is always welcome too!\n\n💬 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!\n\n-----------------------------\n🎱🎫 VARIETY 🎫🎱\n-----------------------------\nWe also try to give our social media volunteers a few other shifts, just for a little variety! \n\n🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n🎱 Games: run TOURNAMENTS and share promos so guests have FUN\n🍺 Bars: Help our bartenders (no skills needed).\n🛟 Floater: literally just BE THERE and ready to help`;
+        const SOCIAL_TASKS_BODY = `------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes! Here are the job tasks:\n\n----------------------------------\n💬 GROUPS & CHATS 💬\n----------------------------------\n🎉 Online promotion is VITAL - the MORE people recommending WET (Hostel & Parties), the bigger and better our party is! We are the #1 preparty for major events and our 🎟Discount Ticket Packages are the best deal. Plus we do nightly group meetups with 🥃free shots, so if people know about it, they will join!\n\n💬 We'll send you a list of groups to join and be active in. If you know others - especially for different demographics (like German, LGBTQ, Solo Travel, etc) - please share!\n\nPeople are posting everywhere asking advice about parties, tickets, meetups, hostels, etc. and we want to be a helpful source of info that favors WET, not just an annoying ad spammer! Volunteers need to check groups & chats daily to answer questions (or ask/tag me if you don't know) and recommend WET to everyone and build hype!\n\n--------------------------------------\n💬 INSTAGRAM & TIKTOK 💬\n--------------------------------------\n📸 Between Full Moons, post IG stories AND Feed/Reel posts several times a week. (Without organic content, it's just a wall of event flyers!) During Full Moon Week we want to post TONS of content.\n\ud83c\udfa5 Post as often as possible on TikTok (it's newer & smaller).\n\u2702 Edit content for now & future. We have a content archive you can use & we need you to leave us with more content for it.\n\ud83d\udcc1Between Full Moons, spend some time organizing that content archive.\n\ud83d\udce4 Send us raw content before you leave for future use.\n#️⃣ Get others to tag us (free shot - you can join them too!) & tag them in our posts! Also ask for a review on Google and TripAdvisor for more free shots!\n\n----------------------------------\n📢 GROUND PROMO 📢\n----------------------------------\n\ud83d\udc40We ask you to be our eyes & ears making sure volunteer promo shifts are out engaging with guests all day. The WET group chats are useful for this - volunteers send pics out promoting; games shifts post to gather tournament players; and all volunteers need to be checking their phones regularly to be active in our work chat and promoting in groups/chats.\n\nOur Promotion Volunteer checks hourly that promo & games are active, reminding them to post activity announcements. Any creative input to improve is always welcome too!\n\n💬 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!\n\n-----------------------------\n\ud83c\udfb1\ud83c\udfab VARIETY \ud83c\udfab\ud83c\udfb1\n-----------------------------\nWe also try to give our social media volunteers a few other shifts, just for a little variety! \n\n🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n\ud83c\udfb1 Games: run TOURNAMENTS and share promos so guests have FUN\n🍺 Bars: Help our bartenders (no skills needed).\n\ud83d\udecf Floater: literally just BE THERE and ready to help`;
         
         const BUMMER_FULL = `------------------------------------\n🚨THE BUMMER STUFF🚨\n------------------------------------\nTo avoid flakes, we require a deposit and bookings (about 3500 baht, fully REFUNDABLE). This shows commitment & gives you the guest experience (including guest chats). On confirmation, we'll send you simple links to follow.\n\nNo-show/last-minute cancellation or repeatedly not doing shifts/tasks will affect refunds (this is very rare), but otherwise all will be FULLY REFUNDED.\n\n🚨IF you are NOT OK with this, we are not a match for hosting you.`;
         const BUMMER_LIGHT = `------------------------------------\n🚨THE BUMMER STUFF🚨\n------------------------------------\nWhile we normally require a deposit, for stays outside of Full Moon Week we just ask you to make 2 small bookings (1-night Hostelworld + 1-night BDC). This confirms your commitment and lets you join the guest chats.\n\nBoth will be FULLY REFUNDED at the end of your stay from reception, unless you no-show or don't make art!\n\n🚨IF you are NOT ok with this, please let us know right away.`;
-        const FOOTER_LINKS = `------------------------------------\n💬 GROUPS & CHATS 💬\n------------------------------------\n⭐Even if you don't join us, these are great resources!⭐\n\nPromoting is a big part of your job. Help us spread the word about our hostel & parties online too! NEVER hard promote, we just mention WET when it's relevant.\n\n✅ REQUIRED TO JOIN AND BE ACTIVE IN: ✅\nHOSTELWORLD CHAT: join on the app with your booking.\n\nINSTAGRAM: https://tinyurl.com/FMPIGChat\n\nWHATSAPP: https://tinyurl.com/FMPSiteChat & https://tinyurl.com/FullMoonChat\n\n✅ FOLLOW OUR SOCIALS: ✅\nhttps://www.tiktok.com/@wetpoolparty\nhttps://instagram.com/WETPoolParty\nhttps://instagram.com/WETHostel\nhttps://instagram.com/FullMoonWeek\n\n🔗 MORE RESOURCES: 🔗\nhttps://www.wildandwandering.com/links#h.3ocvvd04j9x - tons of travel chats!\n\nWhen you confirm, we will provide more useful social media & travel links too! Let us know if you'd like to join us!`;
+        const FOOTER_LINKS = `------------------------------------\n💬 GROUPS & CHATS 💬\n------------------------------------\n⭐Even if you don't join us, these are great resources!⭐\n\nPromoting is a big part of your job. Help us spread the word about our hostel & parties online too! NEVER hard promote, we just mention WET when it's relevant.\n\n== REQUIRED TO JOIN AND BE ACTIVE IN: ==\nHOSTELWORLD CHAT: join on the app with your booking.\n\nINSTAGRAM: https://tinyurl.com/FMPIGChat\n\nWHATSAPP: https://tinyurl.com/FMPSiteChat & https://tinyurl.com/FullMoonChat\n\n== FOLLOW OUR SOCIALS: ==\nhttps://www.tiktok.com/@wetpoolparty\nhttps://instagram.com/WETPoolParty\nhttps://instagram.com/WETHostel\nhttps://instagram.com/FullMoonWeek\n\n🔗 MORE RESOURCES: 🔗\nhttps://www.wildandwandering.com/links#h.3ocvvd04j9x - tons of travel chats!\n\nWhen you confirm, we will provide more useful social media & travel links too! Let us know if you'd like to join us!`;
         const DATE_EXPLAIN_HEADER = `📍DAY 1: Latest Arrival Date\n😴 DAY 2: Relax, Possible Light Promo\n📅 DAY 3: Schedule Created, Possible Light Promo\n📋 DAY 4: Training, Possible Light Promo\n🎉 DAYS 5&6: Work Shifts for 24-Hour Parties\n🌕 DAY 7: Full Moon Party, Work Shifts\n🎉 DAYS 8&9: Work Shifts for 24-Hour Parties\n🩹 DAY 10: Recovery Day, Final Tasks\n👋 DAY 11: Earliest Departure Date\n\n`;
 
         function convertToISO(dateStr) {
@@ -260,7 +260,6 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             
             if (m && d && y) return `${y}-${m}-${d}`;
             
-            // fallback
             let parts = dateStr.split(/[\/\s,]+/);
             if (parts.length >= 2) {
                 const mf = months[parts[0].substring(0,3)];
@@ -288,8 +287,6 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                 agoda_in = getLocalDateString(nextDay);
 
                 let matchedShift = null;
-                
-                // Gather all shifts and find the one that occurs strictly inside the volunteer's dates
                 let allShifts = [];
                 for (let range of FMW_RANGES) {
                     allShifts.push(...range.partyStarts);
@@ -303,7 +300,6 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                     }
                 }
 
-                // Fallback if they miss the explicit shift date but overlap a FMW range
                 if (!matchedShift) {
                     for (let range of FMW_RANGES) {
                         if (volState.startDate <= range.end && volState.endDate >= range.start) {
@@ -325,6 +321,67 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                 }
             }
             return { bdc_in, bdc_out, agoda_in, hw_in, hw_out };
+        }
+
+        function getFmwDetails(checkin, checkout) {
+            if (!checkin || !checkout) return null;
+            
+            const r = FMW_RANGES.find(range => checkin <= range.end && checkout >= range.start);
+            if (!r) return null;
+            
+            let partyStart = r.partyStarts[0];
+            if (r.partyStarts.length > 1) {
+                const ci = new Date(checkin);
+                let minDiff = Infinity;
+                r.partyStarts.forEach(p => {
+                    const diff = Math.abs(new Date(p) - ci);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        partyStart = p;
+                    }
+                });
+            }
+            
+            if (!partyStart) return null;
+            
+            const psDate = new Date(partyStart);
+            psDate.setDate(psDate.getDate() + 2);
+            const fmpISO = getLocalDateString(psDate);
+            
+            // Map of known 2026 FMP dates to Buddha Days / user format
+            const fmwDetailsMap = {
+                "2026-06-01": { fmwName: "June", partyDates: "30-3rd", fmpDate: "1Jun", extra: ", Visakha Bucha Buddha Day 31st" },
+                "2026-06-29": { fmwName: "June2", partyDates: "27-1st", fmpDate: "29Jun", extra: "" },
+                "2026-07-31": { fmwName: "July", partyDates: "29Jul-2Aug", fmpDate: "31Jul", extra: ", Asalha Bucha & Buddhist Lent Buddha Day 29th & 30th" },
+                "2026-08-28": { fmwName: "August", partyDates: "26-30th", fmpDate: "28Aug", extra: "" },
+                "2026-09-26": { fmwName: "September", partyDates: "24-28th", fmpDate: "26Sep", extra: "" },
+                "2026-10-27": { fmwName: "October", partyDates: "25-29th", fmpDate: "27Oct", extra: ", Ok Phansa Day Buddhist Lent Ending Buddha Day 26th" },
+                "2026-11-24": { fmwName: "November", partyDates: "22-26th", fmpDate: "24Nov", extra: "" },
+                "2026-12-24": { fmwName: "December", partyDates: "22-26th", fmpDate: "24Dec", extra: "" },
+                "2026-12-31": { fmwName: "New Year's", partyDates: "29-2nd", fmpDate: "31Dec", extra: "" }
+            };
+            
+            if (fmwDetailsMap[fmpISO]) {
+                return fmwDetailsMap[fmpISO];
+            }
+            
+            // Dynamic fallback if date is changed by user via editor
+            const monthsShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const fmpDayStr = psDate.getDate() + monthsShort[psDate.getMonth()];
+            
+            let partyDates = r.rangeStr;
+            const partyReg = r.fullStr.match(/🎉([^\s👋😴📍]*)/);
+            if (partyReg) partyDates = partyReg[1];
+            
+            let fmwName = r.month.charAt(0) + r.month.slice(1).toLowerCase();
+            if (fmwName.includes('&')) fmwName = fmwName.split('&')[0].trim();
+            
+            return {
+                fmwName: fmwName,
+                partyDates: partyDates,
+                fmpDate: fmpDayStr,
+                extra: ""
+            };
         }
 
         function calculateVolunteerDates(startISO, endISO) {
@@ -449,7 +506,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             }
 
             const isBookingCom = /booking\.com|Commissionable\s+amount/i.test(cleanText);
-            const isCreditCard = !isBookingCom && (/\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}/.test(cleanText) || /cvv|cv2|card\s*number/i.test(cleanText));
+            const isCreditCard = !isBookingCom && (/\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}/.test(cleanText) || /cvv|cv2/i.test(cleanText));
 
             if (isBookingCom) return parseBookingCom(cleanText);
             if (isCreditCard) return parseCardData(cleanText);
@@ -494,12 +551,12 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                 expiry = `${parts[0].padStart(2, '0')}/${parts[1].substring(2)}`;
             }
             const cvv = (text.match(/\b\d{3}\b/g) || []).find(num => !expiry.startsWith(num) && !cardNumber.startsWith(num)) || "";
-            const zip = lines.find(l => /^\d{4,6}$/.test(l) && l !== cvv && !expiry.includes(l) && !/^20\d{2}$/.test(l)) || "";
-            const nameIdx = lines.findIndex(l => /name\s*on\s*card/i.test(l));
+            const zip = lines.find(l => /^\d{4,6}$/.test(l) && l !== cvv && !expiry.includes(l)) || "";
+            const nameIdx = lines.findIndex(l => /name\s*on\s*card|card\s*holder/i.test(l));
             let name = (nameIdx !== -1 && lines[nameIdx + 1]) ? lines[nameIdx + 1] : "";
-            if (!name) name = lines.find(l => !/\d/.test(l) && l.length > 3 && !['visa', 'mastercard', 'cvv', 'cv2', 'card number'].some(lbl => l.toLowerCase().includes(lbl))) || "Unknown Cardholder";
+            if (!name) name = lines.find(l => !/\d/.test(l) && l.length > 3) || "Unknown Cardholder";
             
-            const block = `${name}\n${cardNumber} ${expiry} ${cvv}\n${[email, zip].filter(x => x).join(' ')}`.trim();
+            const block = `${name.toUpperCase()}\n${cardNumber} ${expiry} ${cvv}${email || zip ? '\n' + [email, zip].filter(x => x).join(' ') : ''}`;
             return { type: 'card', block, firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' ') };
         }
 
@@ -545,9 +602,9 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
         }
 
         function parseAirbnb(text) {
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            const isSnippet = lines.length < 10 && lines.some(l => /\d+\s+guests?/.test(l));
-            const findPattern = (regex) => { const match = text.match(regex); return match ? (match[1] || match[0]).trim() : null; };
+            const cleanTextForParsing = text.replace(/[\u2000-\u200F\u202F\u205F\u3000\uFEFF]/g, " ");
+            const lines = cleanTextForParsing.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const findPattern = (regex) => { const match = cleanTextForParsing.match(regex); return match ? (match[1] || match[0]).trim() : null; };
             const findLabelValueExt = (lbl) => {
                 const idx = lines.findIndex(l => l.toLowerCase().replace(/[^a-z]/g,'').includes(lbl.toLowerCase().replace(/[^a-z]/g,'')));
                 if (idx === -1) return "";
@@ -556,7 +613,9 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                 if (lines[idx + 1]) return lines[idx + 1];
                 return "";
             };
-            
+
+            const isSnippet = lines.length < 10 && lines.some(l => /\d+\s+guests?/.test(l));
+
             if (isSnippet) {
                 const name = lines[0]; const listing = lines[1];
                 const dateLine = lines.find(l => /\d/.test(l) && l.includes('night'));
@@ -579,41 +638,134 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             if (fullName.includes('confirmed') || fullName.includes('New booking')) fullName = lines.find(l => !l.includes('booking') && !l.includes('arrives') && l.length > 3) || lines[0];
             if (fullName.includes('·')) fullName = findPattern(/About\s+([A-Z][a-zà-ÿ]+\s+[A-Z][a-zà-ÿ]+)/i) || lines[0];
             
+            // Parse name from "Zach asked about a trip"
+            const askTripMatch = cleanTextForParsing.match(/^(.*?)\s+asked\s+about\s+a\s+trip/i);
+            if (askTripMatch) {
+                fullName = askTripMatch[1].trim();
+            }
+
             const nameParts = fullName.split(' ');
             const locIdx = lines.findIndex(l => l.includes(', ') && /[A-Z]{2}$/.test(l));
             const locationLine = locIdx !== -1 ? lines[locIdx] : "";
             let city = "", country = "";
             if (locationLine) { const parts = locationLine.split(',').map(p => p.trim()); city = parts[0]; country = parts[1]; }
 
-            const checkin = findLabelValueExt('Check-in'); const checkout = findLabelValueExt('Checkout');
-            const totalMatches = Array.from(text.matchAll(/Total\s+\(THB\)\s+฿?([\d,.]+)/gi));
-            const guestPaid = totalMatches[0] ? totalMatches[0][1] : (text.match(/Total\s*\(THB\)\s*\n฿?([\d,.]+)/i)?.[1] || "0");
-            const payoutMatch = text.match(/You\s+earn\s*\n฿?([\d,.]+)/i) || text.match(/You\s+earn\s+฿?([\d,.]+)/i);
-            const hostPayout = payoutMatch ? payoutMatch[1] : (totalMatches.length > 1 ? totalMatches[totalMatches.length - 1][1] : guestPaid);
-            const feeMatch = text.match(/Host\s+service\s+fee.*\s+[−-]?฿?([\d,.]+)/i);
-            const serviceFee = feeMatch ? feeMatch[1] : "0";
+            // High priority robust label/regex scan for Guest count
+            let guestCount = 1;
+            let guestFound = false;
+            for (let i = 0; i < lines.length; i++) {
+                const l = lines[i].toLowerCase().trim();
+                if (l === 'guests' || l === 'total guests') {
+                    if (lines[i+1]) {
+                        const val = parseInt(lines[i+1].trim());
+                        if (!isNaN(val) && val > 0) {
+                            guestCount = val;
+                            guestFound = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!guestFound) {
+                const gMatch = cleanTextForParsing.match(/(\d+)\s*(?:guests?|adults?|people|pax)/i);
+                if (gMatch) {
+                    guestCount = parseInt(gMatch[1]) || 1;
+                } else {
+                    const fallbackGuests = parseInt(findLabelValueExt('Guests'));
+                    if (!isNaN(fallbackGuests)) guestCount = fallbackGuests;
+                }
+            }
+
+            let checkinISOStr = "";
+            let checkoutISOStr = "";
+            let calculatedNights = 1;
+
+            // Robust year parsing to avoid matching historical years like "Joined Airbnb in 2023"
+            let year = 2026;
+            const checkinLabelIdx = lines.findIndex(l => l.toLowerCase().includes('check-in') || l.toLowerCase().includes('checkout'));
+            let yearFound = false;
+            if (checkinLabelIdx !== -1) {
+                for (let i = 0; i <= 3; i++) {
+                    if (lines[checkinLabelIdx + i]) {
+                        const yrM = lines[checkinLabelIdx + i].match(/\b(202\d)\b/);
+                        if (yrM) {
+                            year = parseInt(yrM[1]);
+                            yearFound = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!yearFound) {
+                const matches = [...cleanTextForParsing.matchAll(/\b(202\d)\b/g)];
+                for (let m of matches) {
+                    const idx = m.index;
+                    const pre = cleanTextForParsing.substring(Math.max(0, idx - 30), idx);
+                    if (!pre.toLowerCase().includes('joined')) {
+                        year = parseInt(m[1]);
+                        break;
+                    }
+                }
+            }
+
+            // Robust date range matching (Jun 29 - Jul 1)
+            const rangeMatch = cleanTextForParsing.replace(/\s+/g, ' ').match(/([A-Z][a-z]{2})\s+(\d{1,2})\s*[-–—\s]+\s*(?:([A-Z][a-z]{2})\s+)?(\d{1,2})\s*\(?(\d+)\s*nights?/i);
+            if (rangeMatch) {
+                const month1 = rangeMatch[1];
+                const day1 = rangeMatch[2];
+                const month2 = rangeMatch[3] || month1;
+                const day2 = rangeMatch[4];
+                calculatedNights = parseInt(rangeMatch[5]) || 1;
+                
+                checkinISOStr = convertToISO(`${month1} ${day1} ${year}`);
+                let checkoutYear = year;
+                if (month1.toLowerCase().startsWith('dec') && month2.toLowerCase().startsWith('jan')) {
+                    checkoutYear = year + 1;
+                }
+                checkoutISOStr = convertToISO(`${month2} ${day2} ${checkoutYear}`);
+            } else {
+                const checkin = findLabelValueExt('Check-in'); 
+                const checkout = findLabelValueExt('Checkout') || findLabelValueExt('Check-out');
+                if (checkin) checkinISOStr = convertToISO(checkin);
+                if (checkout) checkoutISOStr = convertToISO(checkout);
+                
+                if (checkinISOStr && checkoutISOStr) {
+                    const ci = new Date(checkinISOStr);
+                    const co = new Date(checkoutISOStr);
+                    calculatedNights = Math.round((co - ci) / (1000 * 60 * 60 * 24));
+                    if (calculatedNights < 1 || isNaN(calculatedNights)) calculatedNights = 1;
+                }
+            }
+
+            // Pricing parsing
+            let guestPaid = "0";
+            const netMatch = cleanTextForParsing.match(/(?:Total\s*\(THB\)|You\s+earn)\s*\n\s*฿?([\d,.]+)/i);
+            if (netMatch) {
+                guestPaid = netMatch[1];
+            } else {
+                const totalMatches = Array.from(cleanTextForParsing.matchAll(/Total\s+\(THB\)\s+฿?([\d,.]+)/gi));
+                guestPaid = totalMatches[0] ? totalMatches[0][1] : (cleanTextForParsing.match(/Total\s*\(THB\)\s*\n฿?([\d,.]+)/i)?.[1] || "0");
+            }
+
+            let hostPayout = guestPaid;
+            const payoutMatch = cleanTextForParsing.match(/You\s+earn\s*\n\s*฿?([\d,.]+)/i) || cleanTextForParsing.match(/You\s+earn\s+฿?([\d,.]+)/i);
+            if (payoutMatch) hostPayout = payoutMatch[1];
+
+            let serviceFee = "0";
+            const feeMatch = cleanTextForParsing.match(/(?:Host\s+service\s+fee|Service\s+fee\s*\(host\))\s*\n\s*[-−—]?\s*฿?([\d,.]+)/i);
+            if (feeMatch) serviceFee = feeMatch[1];
 
             const confCode = findLabelValueExt('Confirmation code');
             let policy = findLabelValueExt('Cancellation policy') || lines.find(l => l.includes('Your cancellation policy'))?.split('is').pop().trim();
             if (policy) policy = policy.replace(/^for guests is\s+/i, '').replace(/\.$/, '').trim();
             const listingName = lines.find(l => l.includes('Hostel') || l.includes('WET Pool Party') || l.includes('2-nt'));
 
-            const checkinISOStr = convertToISO(checkin);
-            const checkoutISOStr = convertToISO(checkout);
-            let calculatedNights = 1;
-            if (checkinISOStr && checkoutISOStr) {
-                const ci = new Date(checkinISOStr);
-                const co = new Date(checkoutISOStr);
-                calculatedNights = Math.round((co - ci) / (1000 * 60 * 60 * 24));
-                if (calculatedNights < 1 || isNaN(calculatedNights)) calculatedNights = 1;
-            }
-
-            const otherDetails = `${fullName}\n${city || "---"}, ${country || "---"}\nTOTAL PRICE: ${guestPaid.replace(/,/g, '')}\nFEE: ${serviceFee.replace(/[^\d.]/g, '')}\nNET PRICE: ${hostPayout.replace(/,/g, '')}\nCheck-in: ${checkin}\nCheckout: ${checkout}\nCODE: ${confCode || "---"}\nPOLICY: ${policy || "---"}\nLISTING: ${listingName || "---"}`;
+            const otherDetails = `${fullName}\n${city || "---"}, ${country || "---"}\nTOTAL PRICE: ${guestPaid.replace(/,/g, '')}\nFEE: ${serviceFee.replace(/[^\d.]/g, '')}\nNET PRICE: ${hostPayout.replace(/,/g, '')}\nCheck-in: ${checkinISOStr || "---"}\nCheckout: ${checkoutISOStr || "---"}\nCODE: ${confCode || "---"}\nPOLICY: ${policy || "---"}\nLISTING: ${listingName || "---"}`;
 
             return { 
                 type: 'airbnb', firstName: nameParts[0], lastName: nameParts.slice(1).join(' '), city, country, email: "", phone: "",
                 totalPrice: `฿${f(guestPaid.replace(/,/g, ''))}`, commission: `฿${f(serviceFee.replace(/[^\d.]/g, ''))}`, payout: `฿${f(hostPayout.replace(/,/g, ''))}`, 
-                guestCount: parseInt(findLabelValueExt('Guests')) || 1, nights: calculatedNights,
+                guestCount, nights: calculatedNights,
                 checkinISO: checkinISOStr, checkoutISO: checkoutISOStr,
                 otherDetails, listingName 
             };
@@ -684,7 +836,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             
             const { bdc_in, bdc_out, agoda_in, hw_in, hw_out } = getConfirmDates();
 
-            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n⛴ Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n➡🏝 TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-phangan/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n🏝➡ TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! 😂 We'll see you soon! 😍`;
+            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n\u26CF Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n\u27A1\ud83c\udfdd TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-phangan/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n\ud83c\udfdd\u27A1 TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! \ud83d\ude02 We'll see you soon! \ud83d\ude0d`;
 
             if (role === 'art' && noFullMoon) {
                 return `Thanks for accepting and joining us! Please let us know ASAP if anything changes in your dates. There's a LOT of info in here, please read it carefully and follow instructions, click links, etc., then ask us any unanswered questions!
@@ -694,27 +846,27 @@ CONFIRMING
 ------------------
 As explained, your stay isn't guaranteed until the following is completed:
 
-🚨1) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
-🚨2) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
-🚨3) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${bdc_in}&to=${bdc_out}&guests=1
+\ud83d\udea81) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
+\ud83d\udea82) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
+\ud83d\udea83) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${bdc_in}&to=${bdc_out}&guests=1
 
-🚨🚨 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) 🚨🚨
+\ud83d\udea8\ud83d\udea8 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) \ud83d\udea8\ud83d\udea8
 
 Remember, EVERYTHING will be REFUNDED at the end of your stay as long as you completed your project.
 
-💬 The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, recommend WET to people, and answer questions about Phangan (ask if you don't know!)
+\ud83d\udcac The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, recommend WET to people, and answer questions about Phangan (ask if you don't know!)
 
-📝 If you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
+\ud83d\udcdd If you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
 
 ---------
 CHATS
 ---------
 You MUST be active on these 4 groups (but please check all the groups we sent you in our previous message):
 
-💬 https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
-💬 https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
-💬 https://tinyurl.com/FMPChat &
-💬 https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
+\ud83d\udcac https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
+\ud83d\udcac https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
+\ud83d\udcac https://tinyurl.com/FMPChat &
+\ud83d\udcac https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
 
 You should already be following our socials - tag us in your posts and we can give you posting access too.
 https://www.tiktok.com/@wetpoolparty
@@ -722,22 +874,22 @@ https://Instagram.com/WetPoolParty
 https://Instagram.com/WetHostel
 https://Instagram.com/FullMoonWeek
 
-💬 If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
+\ud83d\udcac If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
 
 -------------
 ARRIVING
 -------------
 Details on how to get here are below in TRAVEL, but if you get here between Full Moons, it can be very quiet and casual and a bit confusing:
-☛ Message the group chat to say hi!
-☛ Reception should check you in, but they may be running around.
-☛ If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
-☛ Pick an available bed and message the bed # to the group chat.
-☛ Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception. They can get you set up and get the art supplies you need.
-☛ If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
+\u261E Message the group chat to say hi!
+\u261E Reception should check you in, but they may be running around.
+\u261E If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
+\u261E Pick an available bed and message the bed # to the group chat.
+\u261E Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception. They can get you set up and get the art supplies you need.
+\u261E If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
 
-☛ Any problems, tell staff, message the group chat, or message me directly!
-☛ Hang out with staff, guests & each other - we operate as a family!
-☛ There isn't formal work schedule - make art whenever you want, as long as you leave us with something beautiful!
+\u261E Any problems, tell staff, message the group chat, or message me directly!
+\u261E Hang out with staff, guests & each other - we operate as a family!
+\u261E There isn't formal work schedule - make art whenever you want, as long as you leave us with something beautiful!
 
 ${TRAVEL_CONFIRM}`;
             }
@@ -749,28 +901,28 @@ CONFIRMING
 ------------------
 As explained, your stay isn't guaranteed until the following is completed:
 
-🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep
-🚨2) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
-🚨3) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
-🚨4) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${hw_in}&to=${hw_out}&guests=1
+\ud83d\udea81) Click to make a 3000b deposit - https://tinyurl.com/VolDep
+\ud83d\udea82) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
+\ud83d\udea83) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
+\ud83d\udea84) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${hw_in}&to=${hw_out}&guests=1
 
-🚨🚨 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) 🚨🚨
+\ud83d\udea8\ud83d\udea8 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) \ud83d\udea8\ud83d\udea8
 
 Remember, EVERYTHING will be REFUNDED after Full Moon Week (bookings in cash, deposit reversed to your card) as long as you show up and do your shifts. Repeatedly not doing shifts can result in penalties.
 
-💬 The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, tell people to party at WET, and answer questions about Full Moon (ask if you don't know!)
+\ud83d\udcac The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, tell people to party at WET, and answer questions about Full Moon (ask if you don't know!)
 
-📝 After Full Moon, if you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
+\ud83d\udcdd After Full Moon, if you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
 
 ---------
 CHATS
 ---------
 You MUST be active on these 4 groups (but please check all the groups we sent you in our previous message):
 
-💬 https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
-💬 https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
-💬 https://tinyurl.com/FMPChat &
-💬 https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
+\ud83d\udcac https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
+\ud83d\udcac https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
+\ud83d\udcac https://tinyurl.com/FMPChat &
+\ud83d\udcac https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
 
 You should already be following our socials - tag us in your posts and we can give you posting access too.
 https://www.tiktok.com/@wetpoolparty
@@ -778,26 +930,26 @@ https://Instagram.com/WetPoolParty
 https://Instagram.com/WetHostel
 https://Instagram.com/FullMoonWeek
 
-🎉 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!
+\ud83c\udf89 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!
 
-💬 If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
+\ud83d\udcac If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
 
 -------------
 ARRIVING
 -------------
 Details on how to get here are below in TRAVEL, but if you get here between Full Moons, it can be very quiet and casual and a bit confusing:
-☛ Message the group chat to say hi!
-☛ Reception should check you in, but they may be running around.
-☛ If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
-☛ Pick an available bed and message the bed # to the group chat.
-☛ Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception.
-☛ If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
+\u261E Message the group chat to say hi!
+\u261E Reception should check you in, but they may be running around.
+\u261E If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
+\u261E Pick an available bed and message the bed # to the group chat.
+\u261E Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception.
+\u261E If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
 
-☛ Any problems, tell staff, message the group chat, or message me directly!
-☛ Hang out with staff, guests & each other - we operate as a family!
-☛ There isn't formal work until 4 days before Full Moon, though be active on the group chat in case anything comes up. Relax and enjoy the calm before the party!
-☛ 3 days before Full Moon, we'll have a full volunteer meeting and go over everything!
-☛ Shifts are 5 days - 2 days before Full Moon to 2 days after. DO NOT flake out after Full Moon (we're all tired, but the party must go on!)
+\u261E Any problems, tell staff, message the group chat, or message me directly!
+\u261E Hang out with staff, guests & each other - we operate as a family!
+\u261E There isn't formal work until 4 days before Full Moon, though be active on the group chat in case anything comes up. Relax and enjoy the calm before the party!
+\u261E 3 days before Full Moon, we'll have a full volunteer meeting and go over everything!
+\u261E Shifts are 5 days - 2 days before Full Moon to 2 days after. DO NOT flake out after Full Moon (we're all tired, but the party must go on!)
 
 ${TRAVEL_CONFIRM}`;
         }
@@ -832,17 +984,114 @@ ${TRAVEL_CONFIRM}`;
         }
 
         function generateReplyString() {
-            const { guestName, guests: g, nights: n, budget: b, standard: sRate, superior: sup, female: fem, exBudgetBed, exStandBed, exSuperBed, exFemBed, exBudgetPriv, exStandPriv, exSuperPriv, exFemPriv } = quoteState;
+            const { guestName, guests: g, nights: n, budget: b, standard: sRate, superior: sup, female: fem, exBudgetBed, exStandBed, exSuperBed, exFemBed } = quoteState;
             const s = (count, single, plural) => parseInt(count) === 1 ? single : plural;
-            const privateCalc = (price, cap) => {
-                if (!price) return "0";
-                let res = 0; if (cap === 4) res = (g===4?4:(g<4?3.9:(g===6?6:(g<6?5.75:(g===8?8:7.75)))))*price;
-                else if (cap === 6) res = (g===6?6:(g<6?5.75:(g===8?8:7.75)))*price;
-                else if (cap === 8) res = (g===8?8:7.75)*price;
-                return res ? f(Math.round(res)) : "N/A";
+            
+            const fmw = getFmwDetails(quoteState.checkinISO, quoteState.checkoutISO);
+            let greeting = "";
+            if (fmw) {
+                greeting = `Hi ${guestName}! Thanks for requesting for ${fmw.fmwName} Full Moon Week (${fmw.partyDates}, FMP on ${fmw.fmpDate}${fmw.extra})! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.`;
+            } else {
+                greeting = `Hi ${guestName}! Thanks for requesting to chill with us between Full Moons when it's peaceful and quiet! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.`;
+            }
+
+            const getBudgetPrivate = () => {
+                if (g === 4) return 4 * b;
+                if (g < 4) return Math.round(3.9 * b);
+                if (g === 6) return 6 * b;
+                if (g < 6) return Math.round(5.75 * b);
+                if (g === 8) return 8 * b;
+                if (g < 8) return Math.round(7.75 * b);
+                return 0;
             };
-            const formatDormLine = (label, rate, extra) => parseInt(g) === 1 ? `${label}: ${f(rate)} baht total, extra nights are ${f(extra)} baht per person per night.` : `${label}: ${f(rate)} baht - ${f(g * rate)} total, extra nights are ${f(extra)} baht per person per night.`;
-            return `Hi ${guestName}! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.\n\n฿🇹🇭 All prices in THB. Dorms are per person, private is whole room.\n\n🛌POOL HOSTEL BEDS:\n${formatDormLine('BUDGET Dorm', b, exBudgetBed)}\n${formatDormLine('STANDARD Dorm', sRate, exStandBed)}\n${formatDormLine('SUPERIOR Dorm', sup, exSuperBed)}\n${formatDormLine('FEMALE Dorm', fem, exFemBed)}\n\n🏩DORMS FOR PRIVATE USE:\nBUDGET: ${privateCalc(b, 4)} baht | STANDARD: ${privateCalc(sRate, 6)} baht | SUPERIOR: ${privateCalc(sup, 6)} baht | FEMALE: ${privateCalc(fem, 8)} baht\n\n--------------------\n🚨Please let us know if you would like us to book one of these options as we often sell out!`;
+
+            const getStandardPrivate = () => {
+                if (g === 6) return 6 * sRate;
+                if (g < 6) return Math.round(5.75 * sRate);
+                if (g === 8) return 8 * sRate;
+                if (g < 8) return Math.round(7.75 * sRate);
+                return 0;
+            };
+
+            const getSuperiorPrivate = () => {
+                if (g === 6) return 6 * sup;
+                if (g < 6) return Math.round(5.75 * sup);
+                if (g === 8) return 8 * sup;
+                if (g < 8) return Math.round(7.75 * sup);
+                return 0;
+            };
+
+            const getFemalePrivate = () => {
+                if (g === 8) return 8 * fem;
+                if (g < 8) return Math.round(7.75 * fem);
+                return 0;
+            };
+
+            const getBudgetPrivateExtra = () => {
+                if (g <= 4) return 799;
+                if (g <= 6) return 1199;
+                return 1599;
+            };
+
+            let shortStayBlock = "";
+            if (n < 3) {
+                shortStayBlock = `\n\n🎉ALSO: Do you know Full Moon Party is a WEEKLONG event with at least FIVE days of all-night parties. Our 💦24-hour Pool Party preparty💦 starts 2 days before Full Moon night until 2 days after!
+
+Check out @FullMoonWeek on IG for an idea of all the parties!
+
+There are dozen of events, but the usual major line-up is:
+2⃣ DAYS BEFORE: Waterfall Festival, Utopia, 5-day WET Pool Party pre starts
+1⃣ DAY BEFORE: Jungle Experience, WET pre
+🌕FULL MOON PARTY 24 hours
+1⃣ DAY AFTER: WET FOAM Party
+2⃣ DAYS AFTER: Waterfall Festival, WET Karaoke pre
+
+PLUS many weeklies:
+Fri - OXA Party, Lighthouse, PsyDay, Guy's Bar, Rasta Home
+Sat - Eden, Seaside, Hollystone
+Sun - Bambu, Sinewave DnB
+Mon - Monday Madness
+Tue - Lighthouse, PsyDay
+
+and MUCH MORE!
+
+--------------------
+🚨We HIGHLY recommend staying at least 3 or 4 days and offer super-cheap extensions! Let us know!`;
+            } else {
+                shortStayBlock = "\n\n😍";
+            }
+
+            return `${greeting}
+
+฿🇹🇭 All prices in THB. Dorms are per person, private is whole room.
+
+AirBnB can only calculate 1 bed, not groups, upgrades, or special requests, so we try to provide details here for WETPoolParty.
+
+--------------------
+💦WET! Pool Party Hostel is a private compound, 3-minute walk from Full Moon Party beach. Famous for our 5-day Full Moon Week (IG @FullMoonWeek) 24-hour party, and relaxing chill vibes between Full Moons. 
+
+Our pool (w/swim-up bar) is surrounded by garden lounge, DJ booth, games, and more. There we have all dorms:
+
+💲BUDGET - 4-10 beds, aircon, shared bathroom, louder area.
+🚺FEMALE - 8 beds, aircon, ensuite bathrooms, quieter area.
+#️⃣STANDARD - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.
+🛅SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
+
+--------------------
+🛌 HOSTEL BEDS:
+BUDGET Dorm: ${f(b)} baht - ${f(g * b)} total, extra nights are ${f(exBudgetBed)} baht per person per night.
+STANDARD Dorm: ${f(sRate)} baht - ${f(g * sRate)} total, extra nights ${f(exStandBed)} baht per person per night.
+SUPERIOR Dorm: ${f(sup)} baht - ${f(g * sup)} total, extra nights ${f(exSuperBed)} baht per person per night.
+FEMALE Dorm: ${f(fem)} baht - ${f(g * fem)} total, extra nights are ${f(exFemBed)} baht per person per night.
+
+🏩 HOSTEL DORMS FOR PRIVATE USE:
+BUDGET Dorm: ${f(getBudgetPrivate())} baht, extra nights ${getBudgetPrivateExtra()} baht per night.
+STANDARD Dorm: ${f(getStandardPrivate())} baht, extra nights 1599 baht per night.
+SUPERIOR Dorm: ${f(getSuperiorPrivate())} baht, extra nights 1799 baht per night.
+FEMALE Dorm: ${f(getFemalePrivate())} baht, extra nights 1599 baht per night.
+
+--------------------
+🚨Please let us know if you would like us to book one of these options as we often sell out!${shortStayBlock}`;
         }
 
         // ==========================================
@@ -913,7 +1162,7 @@ ${TRAVEL_CONFIRM}`;
         }
 
         function renderReplyView(el) {
-            const { guestName, guests, nights, budget, standard, superior, female, exBudgetBed, exStandBed, exSuperBed, exFemBed, exBudgetPriv, exStandPriv, exSuperPriv, exFemPriv, extraNightsOpen } = quoteState;
+            const { guestName, guests, nights, budget, standard, superior, female, exBudgetBed, exStandBed, exSuperBed, exFemBed } = quoteState;
             el.innerHTML = `
                 <div class="flex-1 p-2 flex flex-col gap-2">
                     <div class="bg-indigo-50 border border-indigo-200 p-3 rounded shadow-sm space-y-3">
@@ -935,17 +1184,13 @@ ${TRAVEL_CONFIRM}`;
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase text-center">Superior</label><input type="number" onchange="updateQuote('superior', this.value)" value="${superior||''}" class="p-2 border rounded text-sm text-center"></div>
                             <div class="flex flex-col"><label class="text-[9px] font-black text-indigo-400 uppercase text-center">Female</label><input type="number" onchange="updateQuote('female', this.value)" value="${female||''}" class="p-2 border rounded text-sm text-center"></div>
                         </div>
-                        <details class="group" ${extraNightsOpen ? 'open' : ''} ontoggle="quoteState.extraNightsOpen = this.open">
+                        <details class="group" ${quoteState.extraNightsOpen ? 'open' : ''} ontoggle="quoteState.extraNightsOpen = this.open">
                             <summary class="text-[10px] font-bold text-indigo-600 cursor-pointer uppercase tracking-tighter">Edit Extra Night Rates ↓</summary>
                             <div class="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-indigo-200">
                                 <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Bud</label><input type="number" onchange="updateQuote('exBudgetBed', this.value)" value="${exBudgetBed}" class="p-1 border rounded text-[10px]"></div>
                                 <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Std</label><input type="number" onchange="updateQuote('exStandBed', this.value)" value="${exStandBed}" class="p-1 border rounded text-[10px]"></div>
                                 <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Sup</label><input type="number" onchange="updateQuote('exSuperBed', this.value)" value="${exSuperBed}" class="p-1 border rounded text-[10px]"></div>
                                 <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Bed Fem</label><input type="number" onchange="updateQuote('exFemBed', this.value)" value="${exFemBed}" class="p-1 border rounded text-[10px]"></div>
-                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Bud</label><input type="number" onchange="updateQuote('exBudgetPriv', this.value)" value="${exBudgetPriv}" class="p-1 border rounded text-[10px]"></div>
-                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Std</label><input type="number" onchange="updateQuote('exStandPriv', this.value)" value="${exStandPriv}" class="p-1 border rounded text-[10px]"></div>
-                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Sup</label><input type="number" onchange="updateQuote('exSuperPriv', this.value)" value="${exSuperPriv}" class="p-1 border rounded text-[10px]"></div>
-                                <div class="flex flex-col"><label class="text-[8px] font-semibold opacity-50 uppercase text-center">Priv Fem</label><input type="number" onchange="updateQuote('exFemPriv', this.value)" value="${exFemPriv}" class="p-1 border rounded text-[10px]"></div>
                             </div>
                         </details>
                     </div>
