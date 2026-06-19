@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WET Parser v10.19</title>
+    <title>WET Parser v10.20</title>
+    <!-- Custom Hardcoded Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -26,16 +27,18 @@
 </head>
 <body class="p-2">
     <div id="root" class="max-w-5xl mx-auto flex flex-col gap-2">
+        <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-300 px-4 py-3 rounded shadow-sm gap-4">
             <div class="flex items-center gap-2">
                 <span id="header-icon" class="text-xl">🚀</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.19</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.20</span>
                 <button onclick="openDateModal()" class="ml-2 text-slate-400 hover:text-indigo-600 transition-colors" title="Edit Full Moon Dates">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </button>
             </div>
             
             <div class="flex flex-wrap gap-4 items-end">
+                <!-- Data Tools -->
                 <div class="flex flex-col gap-1">
                     <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Data Engine</div>
                     <div class="flex bg-slate-100 rounded p-1">
@@ -43,6 +46,7 @@
                     </div>
                 </div>
                 
+                <!-- Message Generators -->
                 <div class="flex flex-col gap-1">
                     <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Message Generators</div>
                     <div class="flex bg-slate-100 rounded p-1 gap-1">
@@ -71,6 +75,7 @@
         </div>
     </div>
 
+    <!-- Date Editor Modal -->
     <div id="date-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl flex flex-col overflow-hidden">
             <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -758,6 +763,8 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             };
         }
 
+        function updateVol(field, val) { volState[field] = val; renderResults(); }
+
         function generateVolResponse() {
             const { name, role, arrivalBad, departureBad, noFullMoon, hasArtWindow, dateOverride, unablePreapprove, fullyBooked, discountStay } = volState;
             const hi = name ? `Hi ${name},` : "Hi,";
@@ -815,9 +822,10 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
 
         function generateVolConfirmResponse() {
             const { name, role, noFullMoon } = volState;
+            
             const { bdc_in, bdc_out, agoda_in, hw_in, hw_out } = getConfirmDates();
 
-            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n\ud83e\uddf3 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n\u2708 From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n\u2708 From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n\u26CF Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n\u27A1\ud83c\udfdd TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-phangan/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n\ud83c\udfdd\u27A1 TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! \ud83d\ude02 We'll see you soon! \ud83d\ude0d`;
+            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n⛴ Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n➡🏝 TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-phangan/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n🏝➡ TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! 😂 We'll see you soon! 😍`;
 
             if (role === 'art' && noFullMoon) {
                 return `Thanks for accepting and joining us! Please let us know ASAP if anything changes in your dates. There's a LOT of info in here, please read it carefully and follow instructions, click links, etc., then ask us any unanswered questions!
@@ -827,27 +835,27 @@ CONFIRMING
 ------------------
 As explained, your stay isn't guaranteed until the following is completed:
 
-\ud83d\udea81) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
-\ud83d\udea82) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
-\ud83d\udea83) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${bdc_in}&to=${bdc_out}&guests=1
+🚨1) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
+🚨2) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
+🚨3) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${bdc_in}&to=${bdc_out}&guests=1
 
-\ud83d\udea8\ud83d\udea8 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) \ud83d\udea8\ud83d\udea8
+🚨🚨 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) 🚨🚨
 
 Remember, EVERYTHING will be REFUNDED at the end of your stay as long as you completed your project.
 
-\ud83d\udcac The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, recommend WET to people, and answer questions about Phangan (ask if you don't know!)
+💬 The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, recommend WET to people, and answer questions about Phangan (ask if you don't know!)
 
-\ud83d\udcdd If you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
+📝 If you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
 
 ---------
 CHATS
 ---------
 You MUST be active on these 4 groups (but please check all the groups we sent you in our previous message):
 
-\ud83d\udcac https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
-\ud83d\udcac https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
-\ud83d\udcac https://tinyurl.com/FMPChat &
-\ud83d\udcac https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
+💬 https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
+💬 https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
+💬 https://tinyurl.com/FMPChat &
+💬 https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
 
 You should already be following our socials - tag us in your posts and we can give you posting access too.
 https://www.tiktok.com/@wetpoolparty
@@ -855,22 +863,22 @@ https://Instagram.com/WetPoolParty
 https://Instagram.com/WetHostel
 https://Instagram.com/FullMoonWeek
 
-\ud83d\udcac If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
+💬 If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
 
 -------------
 ARRIVING
 -------------
 Details on how to get here are below in TRAVEL, but if you get here between Full Moons, it can be very quiet and casual and a bit confusing:
-\u261E Message the group chat to say hi!
-\u261E Reception should check you in, but they may be running around.
-\u261E If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
-\u261E Pick an available bed and message the bed # to the group chat.
-\u261E Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception. They can get you set up and get the art supplies you need.
-\u261E If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
+☛ Message the group chat to say hi!
+☛ Reception should check you in, but they may be running around.
+☛ If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
+☛ Pick an available bed and message the bed # to the group chat.
+☛ Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception. They can get you set up and get the art supplies you need.
+☛ If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
 
-\u261E Any problems, tell staff, message the group chat, or message me directly!
-\u261E Hang out with staff, guests & each other - we operate as a family!
-\u261E There isn't formal work schedule - make art whenever you want, as long as you leave us with something beautiful!
+☛ Any problems, tell staff, message the group chat, or message me directly!
+☛ Hang out with staff, guests & each other - we operate as a family!
+☛ There isn't formal work schedule - make art whenever you want, as long as you leave us with something beautiful!
 
 ${TRAVEL_CONFIRM}`;
             }
@@ -882,28 +890,28 @@ CONFIRMING
 ------------------
 As explained, your stay isn't guaranteed until the following is completed:
 
-\ud83d\udea81) Click to make a 3000b deposit - https://tinyurl.com/VolDep
-\ud83d\udea82) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
-\ud83d\udea83) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
-\ud83d\udea84) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${hw_in}&to=${hw_out}&guests=1
+🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep
+🚨2) Make the cheapest 1-bed booking - https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1
+🚨3) Make the cheapest 1-bed booking - https://www.agoda.com/wet-pool-party/hotel/ko-pha-ngan-th.html?adults=1&checkIn=${agoda_in}&los=1
+🚨4) Make the cheapest 1-bed booking - https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${hw_in}&to=${hw_out}&guests=1
 
-\ud83d\udea8\ud83d\udea8 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) \ud83d\udea8\ud83d\udea8
+🚨🚨 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) 🚨🚨
 
 Remember, EVERYTHING will be REFUNDED after Full Moon Week (bookings in cash, deposit reversed to your card) as long as you show up and do your shifts. Repeatedly not doing shifts can result in penalties.
 
-\ud83d\udcac The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, tell people to party at WET, and answer questions about Full Moon (ask if you don't know!)
+💬 The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, tell people to party at WET, and answer questions about Full Moon (ask if you don't know!)
 
-\ud83d\udcdd After Full Moon, if you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
+📝 After Full Moon, if you had a good time (we're sure you will!), it really helps us if you leave a good, honest review for your bookings! And remind us to leave you a WorldPackers review in return!
 
 ---------
 CHATS
 ---------
 You MUST be active on these 4 groups (but please check all the groups we sent you in our previous message):
 
-\ud83d\udcac https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
-\ud83d\udcac https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
-\ud83d\udcac https://tinyurl.com/FMPChat &
-\ud83d\udcac https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
+💬 https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)
+💬 https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)
+💬 https://tinyurl.com/FMPChat &
+💬 https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention WET and invite people to join
 
 You should already be following our socials - tag us in your posts and we can give you posting access too.
 https://www.tiktok.com/@wetpoolparty
@@ -911,26 +919,26 @@ https://Instagram.com/WetPoolParty
 https://Instagram.com/WetHostel
 https://Instagram.com/FullMoonWeek
 
-\ud83c\udf89 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!
+🎉 Online, having multiple people engaging regularly and mentioning WET occasionally ("Anyone at WET?" "Yeah, I'm here now, it's fun!" "I'm going there at 8pm, anyone wanna join?") REALLY encourages people to visit us. We KNOW people love WET once they come - they just need to be invited!
 
-\ud83d\udcac If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
+💬 If you see posts in chats, Facebook groups, etc. about Phangan or Full Moon, please comment about WET and share to our volunteer chat! If you know any other groups/chats, please share!
 
 -------------
 ARRIVING
 -------------
 Details on how to get here are below in TRAVEL, but if you get here between Full Moons, it can be very quiet and casual and a bit confusing:
-\u261E Message the group chat to say hi!
-\u261E Reception should check you in, but they may be running around.
-\u261E If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
-\u261E Pick an available bed and message the bed # to the group chat.
-\u261E Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception.
-\u261E If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
+☛ Message the group chat to say hi!
+☛ Reception should check you in, but they may be running around.
+☛ If no one is there, out the back door of reception, you'll see 3 rooms on the ground floor. Room 211 is the main volunteer dorm.
+☛ Pick an available bed and message the bed # to the group chat.
+☛ Say hi to staff you see around the property - they are really friendly! :) Sao is our general manager, and Fah runs reception.
+☛ If there isn't a bed or the room is messy, tell staff! Volunteers tidy up after themselves, but housekeeping can do a cleaning and make up beds if needed.
 
-\u261E Any problems, tell staff, message the group chat, or message me directly!
-\u261E Hang out with staff, guests & each other - we operate as a family!
-\u261E There isn't formal work until 4 days before Full Moon, though be active on the group chat in case anything comes up. Relax and enjoy the calm before the party!
-\u261E 3 days before Full Moon, we'll have a full volunteer meeting and go over everything!
-\u261E Shifts are 5 days - 2 days before Full Moon to 2 days after. DO NOT flake out after Full Moon (we're all tired, but the party must go on!)
+☛ Any problems, tell staff, message the group chat, or message me directly!
+☛ Hang out with staff, guests & each other - we operate as a family!
+☛ There isn't formal work until 4 days before Full Moon, though be active on the group chat in case anything comes up. Relax and enjoy the calm before the party!
+☛ 3 days before Full Moon, we'll have a full volunteer meeting and go over everything!
+☛ Shifts are 5 days - 2 days before Full Moon to 2 days after. DO NOT flake out after Full Moon (we're all tired, but the party must go on!)
 
 ${TRAVEL_CONFIRM}`;
         }
@@ -1077,16 +1085,16 @@ Please complete your confirmation steps ASAP to guarantee your spot with us!`;
 
             let shortStayBlock = "";
             if (n < 3) {
-                shortStayBlock = `\n\n\ud83c\udf89ALSO: Do you know Full Moon Party is a WEEKLONG event with at least FIVE days of all-night parties. Our \ud83d\udca624-hour Pool Party preparty\ud83d\udca6 starts 2 days before Full Moon night until 2 days after!
+                shortStayBlock = `\n\n🎉ALSO: Do you know Full Moon Party is a WEEKLONG event with at least FIVE days of all-night parties. Our 💦24-hour Pool Party preparty💦 starts 2 days before Full Moon night until 2 days after!
 
 Check out @FullMoonWeek on IG for an idea of all the parties!
 
 There are dozen of events, but the usual major line-up is:
-2\ufe0f\u20e3 DAYS BEFORE: Waterfall Festival, Utopia, 5-day WET Pool Party pre starts
-1\ufe0f\u20e3 DAY BEFORE: Jungle Experience, WET pre
-\ud83c\udf15FULL MOON PARTY 24 hours
-1\ufe0f\u20e3 DAY AFTER: WET FOAM Party
-2\ufe0f\u20e3 DAYS AFTER: Waterfall Festival, WET Karaoke pre
+2⃣ DAYS BEFORE: Waterfall Festival, Utopia, 5-day WET Pool Party pre starts
+1⃣ DAY BEFORE: Jungle Experience, WET pre
+🌕FULL MOON PARTY 24 hours
+1⃣ DAY AFTER: WET FOAM Party
+2⃣ DAYS AFTER: Waterfall Festival, WET Karaoke pre
 
 PLUS many weeklies:
 Fri - OXA Party, Lighthouse, PsyDay, Guy's Bar, Rasta Home
@@ -1098,42 +1106,42 @@ Tue - Lighthouse, PsyDay
 and MUCH MORE!
 
 --------------------
-\ud83d\udea8We HIGHLY recommend staying at least 3 or 4 days and offer super-cheap extensions! Let us know!`;
+🚨We HIGHLY recommend staying at least 3 or 4 days and offer super-cheap extensions! Let us know!`;
             } else {
-                shortStayBlock = "\n\n\ud83d\ude0d";
+                shortStayBlock = "\n\n😍";
             }
 
             return `${greeting}
 
-\u0e3f\ud83c\uddf9\ud83c\udded All prices in THB. Dorms are per person, private is whole room.
+฿🇹🇭 All prices in THB. Dorms are per person, private is whole room.
 
 AirBnB can only calculate 1 bed, not groups, upgrades, or special requests, so we try to provide details here for WETPoolParty.
 
 --------------------
-\ud83d\udca6WET! Pool Party Hostel is a private compound, 3-minute walk from Full Moon Party beach. Famous for our 5-day Full Moon Week (IG @FullMoonWeek) 24-hour party, and relaxing chill vibes between Full Moons. 
+💦WET! Pool Party Hostel is a private compound, 3-minute walk from Full Moon Party beach. Famous for our 5-day Full Moon Week (IG @FullMoonWeek) 24-hour party, and relaxing chill vibes between Full Moons. 
 
 Our pool (w/swim-up bar) is surrounded by garden lounge, DJ booth, games, and more. There we have all dorms:
 
-\ud83d\udcb2BUDGET - 4-10 beds, aircon, shared bathroom, louder area.
-\ud83d\udebaFEMALE - 8 beds, aircon, ensuite bathrooms, quieter area.
-#\ufe0f\u20e3STANDARD - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.
-\ud83d\udec5SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
+💲BUDGET - 4-10 beds, aircon, shared bathroom, louder area.
+🚺FEMALE - 8 beds, aircon, ensuite bathrooms, quieter area.
+#️⃣STANDARD - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.
+🛅SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
 
 --------------------
-\ud83d\udecf HOSTEL BEDS:
+🛌 HOSTEL BEDS:
 BUDGET Dorm: ${f(b)} baht - ${f(g * b)} total, extra nights are ${f(exBudgetBed)} baht per person per night.
 STANDARD Dorm: ${f(sRate)} baht - ${f(g * sRate)} total, extra nights ${f(exStandBed)} baht per person per night.
 SUPERIOR Dorm: ${f(sup)} baht - ${f(g * sup)} total, extra nights ${f(exSuperBed)} baht per person per night.
 FEMALE Dorm: ${f(fem)} baht - ${f(g * fem)} total, extra nights are ${f(exFemBed)} baht per person per night.
 
-\ud83c\udfe9 HOSTEL DORMS FOR PRIVATE USE:
+🏩 HOSTEL DORMS FOR PRIVATE USE:
 BUDGET Dorm: ${f(getBudgetPrivate())} baht, extra nights ${getBudgetPrivateExtra()} baht per night.
 STANDARD Dorm: ${f(getStandardPrivate())} baht, extra nights 1599 baht per night.
 SUPERIOR Dorm: ${f(getSuperiorPrivate())} baht, extra nights 1799 baht per night.
 FEMALE Dorm: ${f(getFemalePrivate())} baht, extra nights 1599 baht per night.
 
 --------------------
-\ud83d\udea8Please let us know if you would like us to book one of these options as we often sell out!${shortStayBlock}`;
+🚨Please let us know if you would like us to book one of these options as we often sell out!${shortStayBlock}`;
         }
 
         // ==========================================
