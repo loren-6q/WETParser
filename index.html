@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WET Parser v10.23</title>
+    <title>WET Parser v10.24</title>
     <!-- Custom Hardcoded Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,7 +31,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-300 px-4 py-3 rounded shadow-sm gap-4">
             <div class="flex items-center gap-2">
                 <span id="header-icon" class="text-xl">🚀</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.23</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.24</span>
                 <button onclick="openDateModal()" class="ml-2 text-slate-400 hover:text-indigo-600 transition-colors" title="Edit Full Moon Dates">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </button>
@@ -600,9 +600,9 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
         }
 
         function parseAirbnb(text) {
-            // Clean non-breaking spaces, thin spaces, and other unicode spaces strictly before doing any parsing operations
+            // Clean non-breaking spaces strictly alongside other unicode spaces to prevent optional regex capture failure
             const cleanTextForParsing = text
-                .replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ")
+                .replace(/[\u00A0\u2000-\u200F\u202F\u205F\u3000\uFEFF]/g, " ")
                 .replace(/[^\S\r\n]+/g, " ");
 
             const lines = cleanTextForParsing.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -648,7 +648,6 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             if (fullName.includes('confirmed') || fullName.includes('New booking')) fullName = lines.find(l => !l.includes('booking') && !l.includes('arrives') && l.length > 3) || lines[0];
             if (fullName.includes('·')) fullName = findPattern(/About\s+([A-Z][a-zà-ÿ]+\s+[A-Z][a-zà-ÿ]+)/i) || lines[0];
             
-            // Parse name from "Zach asked about a trip"
             const askTripMatch = cleanTextForParsing.match(/^(.*?)\s+asked\s+about\s+a\s+trip/i);
             if (askTripMatch) {
                 fullName = askTripMatch[1].trim();
@@ -721,16 +720,8 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             if (rangeMatch) {
                 const month1 = rangeMatch[1];
                 const day1 = rangeMatch[2];
-                const month2 = rangeMatch[3] || month1;
-                const day2 = rangeMatch[4];
                 calculatedNights = parseInt(rangeMatch[5]) || 1;
-                
                 checkinISOStr = convertToISO(`${month1} ${day1} ${year}`);
-                let checkoutYear = year;
-                if (month1.toLowerCase().startsWith('dec') && month2.toLowerCase().startsWith('jan')) {
-                    checkoutYear = year + 1;
-                }
-                checkoutISOStr = convertToISO(`${month2} ${day2} ${checkoutYear}`);
             } else {
                 const checkin = findLabelValueExt('Check-in'); 
                 const checkout = findLabelValueExt('Checkout') || findLabelValueExt('Check-out');
@@ -745,7 +736,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
                 }
             }
 
-            // Force mathematical checkout calculation based on check-in date + nights stay
+            // Force mathematical checkout calculation based on check-in date + nights stay (Guarantees roll over months)
             if (checkinISOStr && calculatedNights) {
                 const ci = new Date(checkinISOStr + 'T12:00:00');
                 ci.setDate(ci.getDate() + calculatedNights);
@@ -847,7 +838,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             
             const { bdc_in, bdc_out, agoda_in, hw_in, hw_out } = getConfirmDates();
 
-            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to... [REMANING TEXT INTACT]`;
+            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n\u26CF Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n\u27A1\ud83c\udfdd TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-phangan/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n\ud83c\udfdd\u27A1 TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! 😂 We'll see you soon! 😍`;
 
             if (role === 'art' && noFullMoon) {
                 return `Thanks for accepting and joining us! Please let us know ASAP if anything changes in your dates. There's a LOT of info in here, please read it carefully and follow instructions, click links, etc., then ask us any unanswered questions!
@@ -1037,6 +1028,28 @@ Please complete your confirmation steps ASAP to guarantee your spot with us!`;
             return `<button onclick="openBookingLink('${url}')" class="w-full py-3 bg-blue-600 text-white text-center rounded shadow-sm font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-2">🔍 WET Rates: ${quoteState.checkinISO} (${quoteState.nights}n)</button>`;
         }
 
+        function cleanPrice(priceStr) {
+            let cleaned = priceStr.trim();
+            // Remove non-numeric symbols except dots, commas and numbers
+            cleaned = cleaned.replace(/[^\d,.]/g, '');
+            // Check if there is only a dot or comma as thousands separator (e.g. 10.144 or 10,144)
+            if (cleaned.includes(',')) {
+                const parts = cleaned.split(',');
+                if (parts[parts.length - 1].length === 3) {
+                    cleaned = cleaned.replace(/,/g, '');
+                } else {
+                    cleaned = cleaned.replace(/,/g, '.');
+                }
+            }
+            if (cleaned.includes('.')) {
+                const parts = cleaned.split('.');
+                if (parts[parts.length - 1].length === 3) {
+                    cleaned = cleaned.replace(/\./g, '');
+                }
+            }
+            return parseFloat(cleaned);
+        }
+
         function runPriceFetcher() {
             const text = document.getElementById('tool-paste').value;
             if (!text) return;
@@ -1046,9 +1059,21 @@ Please complete your confirmation steps ASAP to guarantee your spot with us!`;
                 const regex = new RegExp(room.match.replace(/\s+/g, '\\s+'), 'gi');
                 let match; let foundPrices = [];
                 while ((match = regex.exec(cleanText)) !== null) {
-                    const chunk = cleanText.substring(match.index, match.index + 1200);
+                    let chunk = cleanText.substring(match.index, match.index + 1200);
+                    
+                    // CRITICAL FIX: Chop off the chunk before the "Select Rooms" dropdown options
+                    const selectIdx = chunk.toLowerCase().indexOf("select");
+                    if (selectIdx !== -1) {
+                        chunk = chunk.substring(0, selectIdx);
+                    }
+
                     const priceMatches = [...chunk.matchAll(/THB\s*([\d,.]+)/gi)];
-                    priceMatches.forEach(p => foundPrices.push(parseFloat(p[1].replace(/,/g, ''))));
+                    priceMatches.forEach(p => {
+                        const val = cleanPrice(p[1]);
+                        if (!isNaN(val) && val > 0) {
+                            foundPrices.push(val);
+                        }
+                    });
                 }
                 if (foundPrices.length > 0) quoteState[room.id] = Math.min(...foundPrices);
             });
@@ -1147,7 +1172,7 @@ Our pool (w/swim-up bar) is surrounded by garden lounge, DJ booth, games, and mo
 💲BUDGET - 4-10 beds, aircon, shared bathroom, louder area.
 🚺FEMALE - 8 beds, aircon, ensuite bathrooms, quieter area.
 #️⃣STANDARD - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.
-🛅SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
+\ud83d\udec5SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
 
 --------------------
 🛌 HOSTEL BEDS:
