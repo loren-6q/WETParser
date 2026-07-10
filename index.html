@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WET Parser v10.26</title>
+    <title>WET Parser v10.27</title>
     <!-- Custom Hardcoded Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,7 +31,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-300 px-4 py-3 rounded shadow-sm gap-4">
             <div class="flex items-center gap-2">
                 <span id="header-icon" class="text-xl">🚀</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.26</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.27</span>
                 <button onclick="openDateModal()" class="ml-2 text-slate-400 hover:text-indigo-600 transition-colors" title="Edit Full Moon Dates">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </button>
@@ -861,7 +861,7 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             }
 
             if (discountStay) {
-                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But we've been getting TONS of requests so we thought we could offer a 50% discount on Full Moon Party stays in exchange for very part-time volunteering, if you are available for the entire Full Moon Week from 3 days before Full Moon Party to 3 days after.\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes!\n\nWe have an orientation 3 days before Full Moon Party, and then we ask you for 3 hours per day volunteering for the next 5 days. You will only work on promo tasks - the fun interactive stuff:\n\n📸 Take pics/vids for social media later\n🎥 Tag us on social media\n✍ Leave Google & TripAdvisor reviews\n💬 Mention our parties on Hostelworld chat & other chats\n🎫 Flyer around town to promote our party & discount ticket packages\n🎱 Helping with games!\n\nExtra perks:\n🎉 Discount tickets/free taxi to major parties\n🥃 Free shots (for you & them):\n     - every group of 3+ you bring in!\n     - anyone tagging us on social media!\n     - anyone leaving a good, honest (not fake!) Google or TripAdvisor review!\n\n😍If that sounds like something you'd be up for and we can DEPEND on you, let us know and we can work out dates & a half-price booking for you!😍\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But we've been getting TONS of requests so we thought we could offer a 50% discount on Full Moon Party stays in exchange for very part-time volunteering, if you are available for the entire Full Moon Week from 3 days before Full Moon Party to 3 days after.\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes!\n\nWe have an orientation 3 days before Full Moon Party, and then we ask you for 3 hours per day volunteering for the next 5 days. You will only work on promo tasks - the fun interactive stuff:\n\n📸 Take pics/vids for social media later\n🎥 Tag us on social media\n✍ Leave Google & TripAdvisor reviews\n💬 Mention our parties on Hostelworld chat & other chats\n🎫 Flyer around town to promote our party & discount ticket packages\n\n😍If that sounds like something you'd be up for and we can DEPEND on you, let us know and we can work out dates & a half-price booking for you!😍\n\n${FOOTER_LINKS}`;
             }
 
             if (unablePreapprove) {
@@ -907,36 +907,34 @@ DECEMBER & NEW YEAR'S EVE (18Dec-4Jan) - 📍18Dec 🎉22-26Dec 😴27-28Dec �
             const { name, role, property, noFullMoon } = volState;
             const { bdc_in, bdc_out, wet_hw_in, wet_hw_out, swims_hw_in, swims_hw_out } = getConfirmDates();
 
-            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n⛴ Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n➡🏝 TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n🏝➡ TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! 😂 We'll see you soon! 😍`;
+            const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n\u26CF Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n\u27A1🏝 TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n🏝\u27A1 TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=KP-CM\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! 😂 We'll see you soon! 😍`;
 
             const isNoDeposit = (role === 'art' && noFullMoon) || (property === 'swims' && noFullMoon);
             
-            let bdcLink = "";
-            let hwLink = "";
-            let footerBlock = FOOTER_LINKS;
-
-            if (property === 'swims') {
-                footerBlock = FOOTER_LINKS_SWIMS;
-                bdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
-                hwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
-            } else {
-                bdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
-                hwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${wet_hw_in}&to=${wet_hw_out}&guests=1`;
-            }
+            const wetBdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const wetHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${wet_hw_in}&to=${wet_hw_out}&guests=1`;
+            const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const swimsHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
 
             let confirmSteps = "";
             if (isNoDeposit) {
-                confirmSteps = `🚨1) Make the cheapest 1-bed booking - ${bdcLink}
-🚨2) Make the cheapest 1-bed booking - ${hwLink}`;
+                confirmSteps = `🚨1) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}
+🚨2) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}
+🚨3) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}
+🚨4) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
             } else {
                 confirmSteps = `🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep
-🚨2) Make the cheapest 1-bed booking - ${bdcLink}
-🚨3) Make the cheapest 1-bed booking - ${hwLink}`;
+🚨2) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}
+🚨3) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}
+🚨4) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}
+🚨5) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
             }
 
             let refundMsg = isNoDeposit 
                 ? "Remember, EVERYTHING will be REFUNDED at the end of your stay as long as you completed your project/activities."
                 : "Remember, EVERYTHING will be REFUNDED after Full Moon Week (bookings in cash, deposit reversed to your card) as long as you show up and do your shifts. Repeatedly not doing shifts can result in penalties.";
+
+            let footerBlock = property === 'swims' ? FOOTER_LINKS_SWIMS : FOOTER_LINKS;
 
             return `Thanks for accepting and joining us! Please let us know ASAP if anything changes in your dates. There's a LOT of info in here, please read it carefully and follow instructions, click links, etc., then ask us any unanswered questions!
 
@@ -992,6 +990,9 @@ Details on how to get here are below in TRAVEL, but if you get here between Full
 ${TRAVEL_CONFIRM}`;
         }
 
+        // ==========================================
+        // VOLUNTEER RESPONDER LOGIC (FOLLOW-UP)
+        // ==========================================
         function generateVolFollowupResponse() {
             const { name, role, property, noFullMoon } = volState;
             const hi = name ? `Hi ${name},` : "Hi,";
@@ -999,27 +1000,23 @@ ${TRAVEL_CONFIRM}`;
 
             const isNoDeposit = (role === 'art' && noFullMoon) || (property === 'swims' && noFullMoon);
             
-            let bdcLink = "";
-            let hwLink = "";
-            let footerBlock = FOOTER_LINKS;
-
-            if (property === 'swims') {
-                footerBlock = FOOTER_LINKS_SWIMS;
-                bdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
-                hwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
-            } else {
-                bdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
-                hwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${wet_hw_in}&to=${wet_hw_out}&guests=1`;
-            }
+            const wetBdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const wetHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${wet_hw_in}&to=${wet_hw_out}&guests=1`;
+            const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const swimsHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
 
             let confirmingBlock = "";
             if (isNoDeposit) {
-                confirmingBlock = `\ud83d\udea81) Make the cheapest 1-bed booking - ${bdcLink}
-\ud83d\udea82) Make the cheapest 1-bed booking - ${hwLink}`;
+                confirmingBlock = `\ud83d\udea81) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}
+\ud83d\udea82) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}
+\ud83d\udea83) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}
+\ud83d\udea84) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
             } else {
                 confirmingBlock = `\ud83d\udea81) Click to make a 3000b deposit - https://tinyurl.com/VolDep
-\ud83d\udea82) Make the cheapest 1-bed booking - ${bdcLink}
-\ud83d\udea83) Make the cheapest 1-bed booking - ${hwLink}`;
+\ud83d\udea82) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}
+\ud83d\udea83) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}
+\ud83d\udea84) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}
+\ud83d\udea85) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
             }
 
             let refundClause = isNoDeposit 
@@ -1214,7 +1211,7 @@ Our pool (w/swim-up bar) is surrounded by garden lounge, DJ booth, games, and mo
 💲BUDGET - 4-10 beds, aircon, shared bathroom, louder area.
 🚺FEMALE - 8 beds, aircon, ensuite bathrooms, quieter area.
 #️⃣STANDARD - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.
-\ud83d\udec5SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
+🛅SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.
 
 --------------------
 🛌 HOSTEL BEDS:
@@ -1285,7 +1282,7 @@ FEMALE Dorm: ${f(getFemalePrivate())} baht, extra nights 1599 baht per night.
                             </div>
                             <div class="flex flex-col flex-1">
                                 <span class="text-[9px] font-bold text-slate-500 uppercase">Departure Date</span>
-                                <input type="date" value="${volState.endDate}" onchange="handleManualDate('end', this.value)" class="text-xs p-1.5 border border-indigo-200 rounded text-slate-700 bg-white font-mono uppercase focus:outline-none focus:border-indigo-400">
+                                <input type="date" value="${volState.endDate}" onchange="handleManualDate('end', this.value)" class="text-xs p-1.5 border border-indigo-200 rounded text-slate-700 bg-white font-mono uppercase focus:outline-none focus:border-indigo-400 font-bold">
                             </div>
                         </div>
                         
