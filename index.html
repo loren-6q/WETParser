@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WET Parser v10.29</title>
+    <title>WET Parser v10.30</title>
     <!-- Custom Hardcoded Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,7 +30,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-300 px-4 py-3 rounded shadow-sm gap-4">
             <div class="flex items-center gap-2">
                 <span id="header-icon" class="text-xl">🚀</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.29</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.30</span>
                 <button onclick="openDateModal()" class="ml-2 text-slate-400 hover:text-indigo-600 transition-colors" title="Edit Full Moon Dates">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </button>
@@ -254,17 +254,20 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
         function convertToISO(dateStr) {
             if (!dateStr) return null;
-            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim())) return dateStr.trim();
+            let s = dateStr.trim();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
             
             const months = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-            const match = dateStr.match(/([a-zA-Z]{3})|(\d{4})|(\d{1,2})/g);
+            
+            const match = s.match(/([a-zA-Z]{3})|(\d{4})|(\d{1,2})/g);
             if (!match) return null;
             
             let m="", d="", y=new Date().getFullYear().toString();
             match.forEach(part => {
-                if (/^[a-zA-Z]{3}$/i.test(part)) m = months[part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()];
-                else if (part.length === 4) y = part;
-                else if (part.length <= 2) d = part.padStart(2, '0');
+                const cap = part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+                if (months[cap]) m = months[cap];
+                else if (part.length === 4 && /^\d{4}$/.test(part)) y = part;
+                else if (part.length <= 2 && /^\d{1,2}$/.test(part) && !d) d = part.padStart(2, '0');
             });
             
             return (m && d && y) ? `${y}-${m}-${d}` : null;
@@ -468,18 +471,26 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
         function parseData(text) {
             const cleanText = text.replace(/[\u202a\u202b\u202c\u202d\u202e]/g, "");
 
-            const volPatterns = [
-                /(.*?)\s+wants to stay/i, /(.*?)\s+has applied/i, /(.*?)\s+have applied/i,
-                /(.*?)\s+applied for/i, /(.*?)\s+(?:has|have)?\s*confirmed\s+(?:his|her|their|its)?\s*stay/i
-            ];
-            let volName = "";
-            for (let pattern of volPatterns) {
-                const match = cleanText.match(pattern);
-                if (match) { volName = match[1].trim(); break; }
-            }
-            
-            if (volName || cleanText.includes("Ideal dates:") || cleanText.includes("Arrive on") || cleanText.includes("stay at your place from")) {
-                return parseVolunteer(cleanText, volName);
+            // Explicit check to prevent AirBnB booking pastes from accidentally matching volunteer rules
+            const isOTA = /Check-in|Checkout|Check-out|Confirmation code|Total \(THB\)|You earn|Host service fee|guests\s*·\s*฿|Reservation confirmed|New booking confirmed/i.test(cleanText);
+
+            if (!isOTA) {
+                const volPatterns = [
+                    /(.*?)\s+wants to stay/i, 
+                    /(.*?)\s+has applied/i, 
+                    /(.*?)\s+have applied/i,
+                    /(.*?)\s+applied for/i,
+                    /(.*?)\s+(?:has|have)?\s*confirmed\s+(?:his|her|their|its)?\s*stay/i
+                ];
+                let volName = "";
+                for (let pattern of volPatterns) {
+                    const match = cleanText.match(pattern);
+                    if (match) { volName = match[1].trim(); break; }
+                }
+                
+                if (volName || cleanText.includes("Ideal dates:") || cleanText.includes("Arrive on") || cleanText.includes("stay at your place from")) {
+                    return parseVolunteer(cleanText, volName);
+                }
             }
 
             const isBookingCom = /booking\.com|Commissionable\s+amount/i.test(cleanText);
@@ -581,118 +592,109 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 .replace(/[^\S\r\n]+/g, " ");
 
             const lines = cleanTextForParsing.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            const findPattern = (regex) => { const match = cleanTextForParsing.match(regex); return match ? (match[1] || match[0]).trim() : null; };
-            const findLabelValueExt = (lbl) => {
-                const idx = lines.findIndex(l => l.toLowerCase().replace(/[^a-z]/g,'').includes(lbl.toLowerCase().replace(/[^a-z]/g,'')));
-                if (idx === -1) return "";
-                const currentLineClean = lines[idx].split(new RegExp(lbl + ':?', 'i')).pop().trim();
-                return currentLineClean.length > 2 ? currentLineClean : (lines[idx + 1] || "");
-            };
 
-            const isSnippet = lines.length < 10 && lines.some(l => /\d+\s+guests?/.test(l));
+            // Robust name extraction
+            let fullName = "";
+            const resConfirmedMatch = cleanTextForParsing.match(/Reservation\s+confirmed\s*[-–—]\s*(.*?)\s+arrives/i);
+            const profileMatch = cleanTextForParsing.match(/^([A-Z][a-zà-ÿ]+(?:\s+[A-Z][a-zà-ÿ]+)+)\s*\n(?:Identity verified|Joined|★|\d+\s+review)/im);
+            const newBookingMatch = cleanTextForParsing.match(/New\s+booking\s+confirmed!\s*(.*?)\s+arrives/i);
+            const askTripMatch = cleanTextForParsing.match(/^(.*?)\s+asked\s+about\s+a\s+trip/im);
+            const wantsStayMatch = cleanTextForParsing.match(/^(.*?)\s+wants\s+to\s+stay/im);
+            const aboutGuestMatch = cleanTextForParsing.match(/About\s+([A-Z][a-zà-ÿ]+(?:\s+[A-Z][a-zà-ÿ]+)+)/i);
 
-            if (isSnippet) {
-                const name = lines[0]; const listing = lines[1];
-                const dateLine = lines.find(l => /\d/.test(l) && l.includes('night'));
-                const guestLine = lines.find(l => /^\d+/.test(l) && l.toLowerCase().includes('guest'));
-                const guests = guestLine ? (parseInt(guestLine) || 1) : 1;
-                const nightsMatch = dateLine ? dateLine.match(/(\d+)\s+nights?/) : null; const nights = nightsMatch ? parseInt(nightsMatch[1]) : 1;
-                const rangeMatch = dateLine ? dateLine.match(/([A-Z][a-z]{2})\s(\d{1,2})[^\d]+(\d{1,2})/) : null;
-                let checkin = "", checkout = "";
-                if (rangeMatch) { checkin = `${rangeMatch[1]} ${rangeMatch[2]}`; checkout = `${rangeMatch[1]} ${rangeMatch[3]}`; }
-
-                let checkinISOVal = convertToISO(checkin);
-                let checkoutISOVal = convertToISO(checkout);
-                if (checkinISOVal && nights) {
-                    const ci = new Date(checkinISOVal + 'T12:00:00');
-                    ci.setDate(ci.getDate() + nights);
-                    checkoutISOVal = getLocalDateString(ci);
-                }
-
-                return {
-                    type: 'airbnb', firstName: name.split(' ')[0], lastName: name.split(' ').slice(1).join(' '),
-                    guestCount: guests, nights: nights, checkinISO: checkinISOVal, checkoutISO: checkoutISOVal,
-                    listingName: listing, city: "", country: "", email: "", phone: "",
-                    totalPrice: "---", commission: "---", payout: "---", otherDetails: `${name}\n${listing}\n${dateLine}\n${guests} guests`
-                };
+            if (resConfirmedMatch) fullName = resConfirmedMatch[1].trim();
+            else if (profileMatch) fullName = profileMatch[1].trim();
+            else if (newBookingMatch) fullName = newBookingMatch[1].trim();
+            else if (askTripMatch) fullName = askTripMatch[1].trim();
+            else if (wantsStayMatch) fullName = wantsStayMatch[1].trim();
+            else if (aboutGuestMatch) fullName = aboutGuestMatch[1].trim();
+            else {
+                const ignoreKeywords = ['conversation', 'starred', 'none selected', 'skip to', 'using', 'mail', 'inbox', 'airbnb', 'reservation', 'new booking', 'check-in', 'checkout', 'guests'];
+                fullName = lines.find(l => !ignoreKeywords.some(k => l.toLowerCase().includes(k)) && l.length > 2) || lines[0] || "";
             }
-
-            let fullName = lines[0];
-            if (fullName.includes('confirmed') || fullName.includes('New booking')) fullName = lines.find(l => !l.includes('booking') && !l.includes('arrives') && l.length > 3) || lines[0];
-            if (fullName.includes('·')) fullName = findPattern(/About\s+([A-Z][a-zà-ÿ]+\s+[A-Z][a-zà-ÿ]+)/i) || lines[0];
-            
-            const askTripMatch = cleanTextForParsing.match(/^(.*?)\s+asked\s+about\s+a\s+trip/i);
-            if (askTripMatch) fullName = askTripMatch[1].trim();
 
             const nameParts = fullName.split(' ');
-            const locIdx = lines.findIndex(l => l.includes(', ') && /[A-Z]{2}$/.test(l));
+            
+            // Enhanced City & Country Extraction logic
+            const locIdx = lines.findIndex(l => {
+                if (!l.includes(',')) return false;
+                if (/\d|฿|THB|\$|check|night|review|verified|paid|total|fee|policy|code|reservation|confirmed|booking/i.test(l)) return false;
+                const parts = l.split(',').map(p => p.trim());
+                return parts.length >= 2 && parts.every(p => p.length > 1 && !/\d/.test(p));
+            });
             const locationLine = locIdx !== -1 ? lines[locIdx] : "";
             let city = "", country = "";
-            if (locationLine) { const parts = locationLine.split(',').map(p => p.trim()); city = parts[0]; country = parts[1]; }
+            if (locationLine) {
+                const cleanLoc = locationLine.replace(/^Lives\s+in\s+/i, '').trim();
+                const parts = cleanLoc.split(',').map(p => p.trim());
+                if (parts.length === 2) {
+                    city = parts[0];
+                    country = parts[1];
+                } else if (parts.length >= 3) {
+                    city = parts[0];
+                    country = `${parts[1]}, ${parts[2]}`;
+                }
+            }
 
+            // Guest Count Extraction
             let guestCount = 1;
-            let guestFound = false;
-            for (let i = 0; i < lines.length; i++) {
-                const l = lines[i].toLowerCase().trim();
-                if (l === 'guests' || l === 'total guests') {
-                    if (lines[i+1]) {
-                        const val = parseInt(lines[i+1].trim());
-                        if (!isNaN(val) && val > 0) { guestCount = val; guestFound = true; break; }
-                    }
-                }
-            }
-            if (!guestFound) {
-                const gMatch = cleanTextForParsing.match(/(\d+)\s*(?:guests?|adults?|people|pax)/i);
-                if (gMatch) guestCount = parseInt(gMatch[1]) || 1;
-                else {
-                    const fallbackGuests = parseInt(findLabelValueExt('Guests'));
-                    if (!isNaN(fallbackGuests)) guestCount = fallbackGuests;
+            const dotGuest = cleanTextForParsing.match(/(\d+)\s+guests?\s*·/i);
+            if (dotGuest) {
+                guestCount = parseInt(dotGuest[1]) || 1;
+            } else {
+                const guestsLineIdx = lines.findIndex(l => l.toLowerCase() === 'guests');
+                if (guestsLineIdx !== -1 && lines[guestsLineIdx + 1]) {
+                    const numMatch = lines[guestsLineIdx + 1].match(/(\d+)/);
+                    if (numMatch) guestCount = parseInt(numMatch[1]) || 1;
+                } else {
+                    const generalGuest = cleanTextForParsing.match(/(\d+)\s*(?:adults?|guests?|pax)/i);
+                    if (generalGuest) guestCount = parseInt(generalGuest[1]) || 1;
                 }
             }
 
-            let checkinISOStr = "";
-            let checkoutISOStr = "";
+            // Dates Extraction
+            let checkinStr = "";
+            let checkoutStr = "";
             let calculatedNights = 1;
 
-            let year = new Date().getFullYear();
-            const checkinLabelIdx = lines.findIndex(l => l.toLowerCase().includes('check-in') || l.toLowerCase().includes('checkout'));
-            let yearFound = false;
-            if (checkinLabelIdx !== -1) {
-                for (let i = 0; i <= 3; i++) {
-                    if (lines[checkinLabelIdx + i]) {
-                        const yrM = lines[checkinLabelIdx + i].match(/\b(202\d)\b/);
-                        if (yrM) { year = parseInt(yrM[1]); yearFound = true; break; }
-                    }
+            for (let i = 0; i < lines.length; i++) {
+                const l = lines[i].toLowerCase();
+                if (l === 'check-in' || l === 'check in' || l.startsWith('check-in:') || l.startsWith('check in:')) {
+                    checkinStr = l.includes(':') ? lines[i].split(':')[1].trim() : (lines[i + 1] || "");
                 }
-            }
-            if (!yearFound) {
-                const matches = [...cleanTextForParsing.matchAll(/\b(202\d)\b/g)];
-                for (let m of matches) {
-                    const idx = m.index;
-                    const pre = cleanTextForParsing.substring(Math.max(0, idx - 30), idx);
-                    if (!pre.toLowerCase().includes('joined')) { year = parseInt(m[1]); break; }
+                if (l === 'checkout' || l === 'check-out' || l.startsWith('checkout:') || l.startsWith('check-out:')) {
+                    checkoutStr = l.includes(':') ? lines[i].split(':')[1].trim() : (lines[i + 1] || "");
                 }
             }
 
-            const rangeMatch = cleanTextForParsing.replace(/\s+/g, ' ').match(/([A-Z][a-z]{2})\s+(\d{1,2})\s*[-–—\s]+\s*(?:([A-Z][a-z]{2})\s+)?(\d{1,2})\s*\(?(\d+)\s*nights?/i);
-            if (rangeMatch) {
-                const month1 = rangeMatch[1];
-                const day1 = rangeMatch[2];
-                calculatedNights = parseInt(rangeMatch[5]) || 1;
-                checkinISOStr = convertToISO(`${month1} ${day1} ${year}`);
-            } else {
-                const checkin = findLabelValueExt('Check-in'); 
-                const checkout = findLabelValueExt('Checkout') || findLabelValueExt('Check-out');
-                if (checkin) checkinISOStr = convertToISO(checkin);
-                if (checkout) checkoutISOStr = convertToISO(checkout);
-                
-                if (checkinISOStr && checkoutISOStr) {
-                    const ci = new Date(checkinISOStr);
-                    const co = new Date(checkoutISOStr);
-                    calculatedNights = Math.round((co - ci) / (1000 * 60 * 60 * 24));
-                    if (calculatedNights < 1 || isNaN(calculatedNights)) calculatedNights = 1;
+            if (!checkinStr) {
+                const ciMatch = cleanTextForParsing.match(/Check-in\s*\n\s*([A-Za-z]{3},\s*[A-Za-z]{3}\s*\d{1,2}|[A-Za-z]{3}\s*\d{1,2})/i);
+                if (ciMatch) checkinStr = ciMatch[1];
+            }
+            if (!checkoutStr) {
+                const coMatch = cleanTextForParsing.match(/Checkout\s*\n\s*([A-Za-z]{3},\s*[A-Za-z]{3}\s*\d{1,2}|[A-Za-z]{3}\s*\d{1,2})/i);
+                if (coMatch) checkoutStr = coMatch[1];
+            }
+
+            if (!checkinStr) {
+                const rangeMatch = cleanTextForParsing.replace(/\s+/g, ' ').match(/([A-Z][a-z]{2})\s+(\d{1,2})\s*[-–—\s]+\s*(?:([A-Z][a-z]{2})\s+)?(\d{1,2})/i);
+                if (rangeMatch) {
+                    checkinStr = `${rangeMatch[1]} ${rangeMatch[2]}`;
+                    checkoutStr = `${rangeMatch[3] || rangeMatch[1]} ${rangeMatch[4]}`;
                 }
             }
+
+            const nightsMatch = cleanTextForParsing.match(/(\d+)\s*nights?/i);
+            if (nightsMatch) {
+                calculatedNights = parseInt(nightsMatch[1]) || 1;
+            }
+
+            let year = 2026;
+            const yrMatch = cleanTextForParsing.match(/\b(202\d)\b/);
+            if (yrMatch) year = parseInt(yrMatch[1]);
+
+            let checkinISOStr = convertToISO(checkinStr ? `${checkinStr} ${year}` : "");
+            let checkoutISOStr = convertToISO(checkoutStr ? `${checkoutStr} ${year}` : "");
 
             if (checkinISOStr && calculatedNights) {
                 const ci = new Date(checkinISOStr + 'T12:00:00');
@@ -700,33 +702,57 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 checkoutISOStr = getLocalDateString(ci);
             }
 
+            // Financials Extraction
             let guestPaid = "0";
-            const netMatch = cleanTextForParsing.match(/(?:Total\s*\(THB\)|You\s+earn)\s*\n\s*฿?([\d,.]+)/i);
-            if (netMatch) {
-                guestPaid = netMatch[1];
-            } else {
-                const totalMatches = Array.from(cleanTextForParsing.matchAll(/Total\s+\(THB\)\s+฿?([\d,.]+)/gi));
-                guestPaid = totalMatches[0] ? totalMatches[0][1] : (cleanTextForParsing.match(/Total\s*\(THB\)\s*\n฿?([\d,.]+)/i)?.[1] || "0");
-            }
+            const totalMatch = cleanTextForParsing.match(/Total\s*\(THB\)\s*\n?\s*฿?([\d,.]+)/i) || cleanTextForParsing.match(/guests?\s*·\s*฿([\d,.]+)/i);
+            if (totalMatch) guestPaid = totalMatch[1];
 
             let hostPayout = guestPaid;
-            const payoutMatch = cleanTextForParsing.match(/You\s+earn\s*\n\s*฿?([\d,.]+)/i) || cleanTextForParsing.match(/You\s+earn\s+฿?([\d,.]+)/i);
+            const payoutMatch = cleanTextForParsing.match(/You\s+earn\s*\n?\s*฿?([\d,.]+)/i);
             if (payoutMatch) hostPayout = payoutMatch[1];
 
             let serviceFee = "0";
-            const feeMatch = cleanTextForParsing.match(/(?:Host\s+service\s+fee|Service\s+fee\s*\(host\))\s*\n\s*[-−—]?\s*฿?([\d,.]+)/i);
+            const feeMatch = cleanTextForParsing.match(/Host\s+service\s+fee[^\n]*\n\s*[-−—]?\s*฿?\s*([\d,.]+)/i) || 
+                             cleanTextForParsing.match(/Host\s+service\s+fee[^\n]*?[-−—]?\s*฿\s*([\d,.]+)/i);
             if (feeMatch) serviceFee = feeMatch[1];
 
-            const confCode = findLabelValueExt('Confirmation code');
-            let policy = findLabelValueExt('Cancellation policy') || lines.find(l => l.includes('Your cancellation policy'))?.split('is').pop().trim();
-            if (policy) policy = policy.replace(/^for guests is\s+/i, '').replace(/\.$/, '').trim();
-            const listingName = lines.find(l => l.includes('Hostel') || l.includes('WET Pool Party') || l.includes('2-nt'));
+            let confCode = "---";
+            const codeMatch = cleanTextForParsing.match(/Confirmation\s+code\s*\n?\s*([A-Z0-9]{8,12})/i);
+            if (codeMatch) confCode = codeMatch[1];
 
-            const otherDetails = `${fullName}\n${city || "---"}, ${country || "---"}\nTOTAL PRICE: ${guestPaid.replace(/,/g, '')}\nFEE: ${serviceFee.replace(/[^\d.]/g, '')}\nNET PRICE: ${hostPayout.replace(/,/g, '')}\nCheck-in: ${checkinISOStr || "---"}\nCheckout: ${checkoutISOStr || "---"}\nCODE: ${confCode || "---"}\nPOLICY: ${policy || "---"}\nLISTING: ${listingName || "---"}`;
+            const emailMatch = cleanTextForParsing.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+            const guestEmail = emailMatch ? emailMatch[0] : "";
+
+            const phoneMatch = cleanTextForParsing.match(/Phone:\s*([+\d\s-]{7,20})/) || cleanTextForParsing.match(/([+\d\s-]{9,20})/);
+            const guestPhone = phoneMatch ? phoneMatch[1].trim() : "";
+
+            let policy = "---";
+            const policyMatch = cleanTextForParsing.match(/cancellation\s+policy\s+(?:for\s+guests\s+is\s+)?([A-Za-z]+)/i);
+            if (policyMatch) policy = policyMatch[1].trim();
+
+            // Listing Name Extraction
+            let listingName = "";
+            const listingKeywords = ['resort', 'hostel', 'wet', 'swims', 'sunset beach', 'bed', 'dorm', 'party', 'apartment', 'villa', 'studio', 'room'];
+            const listingExclusions = ['wants to stay', 'reservation', 'confirmed', 'booking', 'check-in', 'checkout', 'check in', 'guests', 'night', 'review', 'identity verified', 'joined', 'translated', 'requirements', 'government', 'house rules', 'cancel', 'payout', 'earnings', 'total', 'paid', 'fee', 'message'];
+            for (let l of lines) {
+                const lLower = l.toLowerCase();
+                if (listingKeywords.some(k => lLower.includes(k)) && 
+                    !listingExclusions.some(k => lLower.includes(k)) && 
+                    l.length > 5) {
+                    listingName = l;
+                    break;
+                }
+            }
+
+            const formattedTotal = guestPaid !== "0" ? guestPaid.replace(/,/g, '') : "---";
+            const formattedFee = serviceFee !== "0" ? serviceFee.replace(/[^\d.]/g, '') : "0";
+            const formattedPayout = hostPayout !== "0" ? hostPayout.replace(/,/g, '') : formattedTotal;
+
+            const otherDetails = `${fullName}\n${city || "---"}, ${country || "---"}\nTOTAL PRICE: ${formattedTotal}\nFEE: ${formattedFee}\nNET PRICE: ${formattedPayout}\nCheck-in: ${checkinISOStr || "---"}\nCheckout: ${checkoutISOStr || "---"}\nCODE: ${confCode}\nPOLICY: ${policy}\nLISTING: ${listingName || "---"}`;
 
             return { 
-                type: 'airbnb', firstName: nameParts[0], lastName: nameParts.slice(1).join(' '), city, country, email: "", phone: "",
-                totalPrice: `฿${f(guestPaid.replace(/,/g, ''))}`, commission: `฿${f(serviceFee.replace(/[^\d.]/g, ''))}`, payout: `฿${f(hostPayout.replace(/,/g, ''))}`, 
+                type: 'airbnb', firstName: nameParts[0] || "", lastName: nameParts.slice(1).join(' ') || "", city, country, email: guestEmail, phone: guestPhone,
+                totalPrice: guestPaid !== "0" ? `฿${f(guestPaid.replace(/,/g, ''))}` : "---", commission: serviceFee !== "0" ? `฿${f(serviceFee.replace(/[^\d.]/g, ''))}` : "฿0", payout: hostPayout !== "0" ? `฿${f(hostPayout.replace(/,/g, ''))}` : "---", 
                 guestCount, nights: calculatedNights,
                 checkinISO: checkinISOStr, checkoutISO: checkoutISOStr,
                 otherDetails, listingName 
@@ -838,7 +864,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
             if (noFullMoon && !dateOverride && role !== 'art') {
                 const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
-                return `${hi} thanks for your request, but you've chosen dates that don't include a Full Moon Week period, which we can't accommodate. If you are able to adjust your dates to include at least one of these periods, we can host you!\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
+                return `${hi} thanks for your request, but you've chosen dates that don't include a Full Moon Week period, which we can'作战 accommodate.\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
             }
 
             const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
