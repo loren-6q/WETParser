@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WET Parser v10.28</title>
+    <title>WET Parser v10.29</title>
     <!-- Custom Hardcoded Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M80 32h288l96 96v352H80z' fill='%23e2e8f0' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M368 32v96h96' fill='none' stroke='%23000' stroke-width='20' stroke-linejoin='round'/><path d='M140 180h160M140 260h230M140 340h230M140 420h230' fill='none' stroke='%23000' stroke-width='20' stroke-linecap='round'/><text x='180' y='320' font-family='monospace' font-weight='800' font-size='120' fill='%231e293b' text-anchor='middle'>W</text><rect x='410' y='280' width='40' height='120' rx='20' transform='rotate(-45 430 340)' fill='%23b45309' stroke='%23000' stroke-width='15'/><circle cx='380' cy='220' r='100' fill='%2338bdf8' stroke='%23000' stroke-width='20'/><path d='M320 220l40 40 80-80' fill='none' stroke='%23fff' stroke-width='25' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,18 +27,16 @@
 </head>
 <body class="p-2">
     <div id="root" class="max-w-5xl mx-auto flex flex-col gap-2">
-        <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between bg-white border border-slate-300 px-4 py-3 rounded shadow-sm gap-4">
             <div class="flex items-center gap-2">
                 <span id="header-icon" class="text-xl">🚀</span>
-                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.28</span>
+                <span id="app-title" class="font-black text-slate-900 tracking-tighter text-xl uppercase">WET Parser 10.29</span>
                 <button onclick="openDateModal()" class="ml-2 text-slate-400 hover:text-indigo-600 transition-colors" title="Edit Full Moon Dates">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </button>
             </div>
             
             <div class="flex flex-wrap gap-4 items-end">
-                <!-- Data Tools -->
                 <div class="flex flex-col gap-1">
                     <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Data Engine</div>
                     <div class="flex bg-slate-100 rounded p-1">
@@ -46,7 +44,6 @@
                     </div>
                 </div>
                 
-                <!-- Message Generators -->
                 <div class="flex flex-col gap-1">
                     <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Message Generators</div>
                     <div class="flex bg-slate-100 rounded p-1 gap-1">
@@ -75,7 +72,6 @@
         </div>
     </div>
 
-    <!-- Date Editor Modal -->
     <div id="date-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl flex flex-col overflow-hidden">
             <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -97,9 +93,6 @@
     </div>
 
     <script>
-        // ==========================================
-        // STATE MANAGEMENT
-        // ==========================================
         let viewMode = 'parser';
         let lastParsedData = null;
         
@@ -114,9 +107,6 @@
 
         const f = (num) => !num ? "0" : new Intl.NumberFormat('en-US').format(num);
 
-        // ==========================================
-        // VOLUNTEER CONSTANTS, DATES & TEMPLATES
-        // ==========================================
         const DEFAULT_DATES_TEXT = `🗓2026🗓
 MAY (25Apr-5May) - 📍25Apr 🎉29Apr-3May 👋5May
 JUNE (26May-5Jun) - 📍26May 🎉30May-3Jun 👋5Jun
@@ -146,21 +136,14 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
         function parseDatesText(text) {
             let year = new Date().getFullYear();
-            const yearMatch = text.match(/🗓(\d{4})🗓/);
-            if (yearMatch) year = parseInt(yearMatch[1]);
-            
-            const lines = text.split('\n');
             const ranges = [];
-            for(let line of lines) {
+            
+            text.split('\n').forEach(line => {
                 line = line.trim();
-                
-                const lineYearMatch = line.match(/🗓(\d{4})🗓/);
-                if (lineYearMatch) {
-                    year = parseInt(lineYearMatch[1]);
-                    continue;
-                }
+                const yMatch = line.match(/🗓(\d{4})🗓/);
+                if (yMatch) { year = parseInt(yMatch[1]); return; }
 
-                if(!line.includes('(') || !line.includes(')')) continue;
+                if (!line.includes('(') || !line.includes(')')) return;
                 
                 const match = line.match(/^(.*?)\s*\((.*?)-(.*?)\)\s*-\s*(.*)$/);
                 if (match) {
@@ -185,7 +168,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                     partyMatches.forEach(m => {
                         let pStr = m[1];
                         let pDayMatch = pStr.match(/^\d+/);
-                        if(pDayMatch) {
+                        if (pDayMatch) {
                             let pDay = pDayMatch[0];
                             let pMonthMatch = pStr.match(/[A-Za-z]{3}/);
                             let pMonth = pMonthMatch ? pMonthMatch[0] : startStr.replace(/\d+/g, '');
@@ -196,35 +179,29 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                             if (pIso) partyStarts.push(pIso);
                         }
                     });
-                    if(partyStarts.length === 0) partyStarts.push(start); 
+                    if (partyStarts.length === 0) partyStarts.push(start); 
                     
                     ranges.push({ month, start, end, rangeStr, fullStr, partyStarts });
                 }
-            }
+            });
             return ranges;
         }
 
         function initDates() {
             const stored = localStorage.getItem('fmw_dates_raw');
-            if (stored) {
-                FMW_RANGES = parseDatesText(stored);
-                if (FMW_RANGES.length === 0) FMW_RANGES = parseDatesText(DEFAULT_DATES_TEXT);
-            } else {
-                FMW_RANGES = parseDatesText(DEFAULT_DATES_TEXT);
-            }
+            FMW_RANGES = parseDatesText(stored || DEFAULT_DATES_TEXT);
+            if (FMW_RANGES.length === 0) FMW_RANGES = parseDatesText(DEFAULT_DATES_TEXT);
         }
         initDates(); 
 
         function openDateModal() {
-            const stored = localStorage.getItem('fmw_dates_raw') || DEFAULT_DATES_TEXT;
-            document.getElementById('date-editor-text').value = stored;
+            document.getElementById('date-editor-text').value = localStorage.getItem('fmw_dates_raw') || DEFAULT_DATES_TEXT;
             document.getElementById('date-modal').classList.remove('hidden');
         }
         function closeDateModal() { document.getElementById('date-modal').classList.add('hidden'); }
         function resetDates() { document.getElementById('date-editor-text').value = DEFAULT_DATES_TEXT; }
         function saveDates() {
-            const val = document.getElementById('date-editor-text').value;
-            localStorage.setItem('fmw_dates_raw', val);
+            localStorage.setItem('fmw_dates_raw', document.getElementById('date-editor-text').value);
             initDates();
             closeDateModal();
             handleInput(); 
@@ -241,26 +218,22 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             const todayISO = getLocalDateString(new Date());
             const active = FMW_RANGES.filter(r => r.start >= todayISO);
             
-            let text = "";
-            let currentYear = null;
+            let text = "", currentYear = null;
             active.forEach(r => {
                 const rangeYear = r.start.split('-')[0];
                 if (rangeYear !== currentYear) {
                     currentYear = rangeYear;
                     text += `🗓${currentYear}🗓\n`;
                 }
-                if (type === 'detailed') text += `${r.month} (${r.rangeStr}) - ${r.fullStr}\n`;
-                else text += `${r.month} (${r.rangeStr})\n`;
+                text += type === 'detailed' ? `${r.month} (${r.rangeStr}) - ${r.fullStr}\n` : `${r.month} (${r.rangeStr})\n`;
             });
             return text.trim();
         }
 
-        // SWIMS-specific template sections
         const SWIMS_ART_TASKS_BODY = `We've got a beautiful Beach Resort that NEEDS your Art & Creativity! Art volunteering is very freeform and flexible!\n\nWe like to let artists be artists, so YOU choose what you'd like to create and where! Staff will support with supplies and help, but YOU set your project and schedule! (Just make sure you get it done before you go, and leave your @tag so people can follow you!)\n\nSWIMS Beach Resort is very peaceful and relaxing between Full Moon Weeks, so, while staff and a few guests and volunteers will be around, you'll have plenty of space to explore the island, work when you please, and create beautiful murals, installations, or designs.`;
         const SWIMS_SOCIAL_TASKS_BODY = `📸 Create engaging content showcasing SWIMS Beach Resort: pool vibes, beach sunsets, swim-up bar hangouts, and daily activities. Post IG stories AND Feed/Reel posts several times a week. (During Full Moon Week we want to post TONS of content!)\n\n🎥 Post as often as possible on TikTok.\n✂ Edit content for now & future. We have a content archive you can use & we need you to leave us with more content for it.\n📂 Between Full Moons, spend some time organizing that content archive.\n📤 Send us raw content before you leave for future use.\n#️⃣ Get others to tag us & tag them in our posts! Also ask for reviews on Google and TripAdvisor.\n\n💬 Online promotion is VITAL - the MORE people recommending SWIMS, the bigger and better our vibe is! We want to build our online community. Volunteers need to check groups & chats daily to answer questions and recommend SWIMS to everyone and build hype!`;
         const SWIMS_STANDARD_TASKS_BODY = `🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n🎱 Games: run TOURNAMENTS and share promos so guests have FUN\n📸 Social Media: make IG & TIKTOK content, get others to TAG us, be ACTIVE in chats.\n🍺 Bars: Help our bartenders (no skills needed).`;
 
-        // Classic WET-specific volunteer templates
         const ART_PURE_BODY = `We are always looking for great art and we'd love to see what you can do! Art volunteering is very freeform and flexible!\n\nWe like to let artists be artists, so YOU choose what you'd like to create and where! Staff will support with supplies and help, but YOU set your project and schedule! (Just make sure you get it done before you go, and leave your @tag so people can follow you!)\n\nHaad Rin is VERY quiet between Full Moon Weeks, so, while staff and a few guests and volunteers will be around, NO babysitting or regulating. You are on your own to explore the island(s) and work when you please. We don't care if it's 4am each night, or make a mural in 3 days and take a week off... Just leave us with something beautiful!`;
         const ART_HYBRID_CLAUSE = `BUT, your stay includes Full Moon Week dates. During that time there's NO time for art and if you stay with us, you'll be doing hostel & party work for those 5 or 6 days. \n\nIf you DO NOT want to do that, please let us know and change your dates to NOT include these dates:\n\n${getCalendarText('simple')}\n\nIf you DO want to join in the Full Moon Week volunteering, we'll include all the details below:\n\n`;
         const STANDARD_TASKS_BODY = `------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes! Your tasks include:\n\n🏃 Runner: ENGAGE guests while ACCURATELY bringing them to rooms\n📢 Promotion: INVITE guest & outsiders (ONLINE too!) to join our party\n🎱 Games: run TOURNAMENTS and share promos so guests have FUN\n📸 Social Media: make IG & TIKTOK content, get others to TAG us, be ACTIVE in chats.\n🍺 Bars: Help our bartenders (no skills needed).\n\nWe require just 🗓5 LONG DAYS of work PER MONTH🗓 - 95% free time as long as you want before & after. It's very quiet in town between Full Moons, but you can chill or explore the islands. We're not gonna babysit or give you busywork; just be active in the staff chat.\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍`;
@@ -269,9 +242,13 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
         const BUMMER_FULL = `------------------------------------\n🚨THE BUMMER STUFF🚨\n------------------------------------\nTo avoid flakes, we require a deposit and bookings (about 3500 baht, fully REFUNDABLE). This shows commitment & gives you the guest experience (including guest chats). On confirmation, we'll send you simple links to follow.\n\nNo-show/last-minute cancellation or repeatedly not doing shifts/tasks will affect refunds (this is very rare), but otherwise all will be FULLY REFUNDED.\n\n🚨IF you are NOT OK with this, we are not a match for hosting you.`;
         const BUMMER_LIGHT = `------------------------------------\n🚨THE BUMMER STUFF🚨\n------------------------------------\nWhile we normally require a deposit, for stays outside of Full Moon Week we just ask you to make 2 small bookings (1-night Hostelworld + 1-night BDC). This confirms your commitment and lets you join the guest chats.\n\nBoth will be FULLY REFUNDED at the end of your stay from reception, unless you no-show or don't make art! (Or for SWIMS, unless you don't do daily light activities!)\n\n🚨IF you are NOT ok with this, please let us know right away.`;
         
-        const FOOTER_LINKS = `------------------------------------\n💬 GROUPS & CHATS 💬\n------------------------------------\n⭐Even if you don't join us, these are great resources!⭐\n\nPromoting is a big part of your job. Help us spread the word about our hostel & parties online too! NEVER hard promote, we just mention WET when it's relevant.\n\n== REQUIRED TO JOIN AND BE ACTIVE IN: ==\nHOSTELWORLD CHAT: join on the app with your booking.\n\nINSTAGRAM: https://tinyurl.com/FMPIGChat\n\nWHATSAPP: https://tinyurl.com/FMPSiteChat & https://tinyurl.com/FullMoonChat\n\n== FOLLOW OUR SOCIALS: ==\nhttps://www.tiktok.com/@wetpoolparty\nhttps://instagram.com/WETPoolParty\nhttps://instagram.com/WETHostel\nhttps://instagram.com/FullMoonWeek\nhttps://instagram.com/FullMoonParty.Thailand\n\n🔗 MORE RESOURCES: 🔗\nhttps://www.wildandwandering.com/links#h.3ocvvd04j9x - tons of travel chats!\n\nWhen you confirm, we will provide more useful social media & travel links too! Let us know if you'd like to join us!`;
-
-        const FOOTER_LINKS_SWIMS = `------------------------------------\n💬 GROUPS & CHATS 💬\n------------------------------------\n⭐Even if you don't join us, these are great resources!⭐\n\nPromoting is a big part of your job. Help us spread the word about our resort online too! NEVER hard promote, we just mention SWIMS when it's relevant.\n\n== REQUIRED TO JOIN AND BE ACTIVE IN: ==\nHOSTELWORLD CHAT: join on the app with your booking.\n\nINSTAGRAM: https://tinyurl.com/FMPIGChat\n\nWHATSAPP: https://tinyurl.com/FMPSiteChat & https://tinyurl.com/FullMoonChat\n\n== FOLLOW OUR SOCIALS: ==\nhttps://www.tiktok.com/@wetpoolparty\nhttps://instagram.com/WETPoolParty\nhttps://instagram.com/SWIMSResort\nhttps://instagram.com/FullMoonWeek\nhttps://instagram.com/FullMoonParty.Thailand\n\n🔗 MORE RESOURCES: 🔗\nhttps://www.wildandwandering.com/links#h.3ocvvd04j9x - tons of travel chats!\n\nWhen you confirm, we will provide more useful social media & travel links too! Let us know if you'd like to join us!`;
+        function getFooterLinks(property = 'wet') {
+            const isSwims = property === 'swims';
+            const propName = isSwims ? "resort" : "hostel & parties";
+            const targetWord = isSwims ? "SWIMS" : "WET";
+            const extraSocial = isSwims ? "\nhttps://instagram.com/SWIMSResort" : "\nhttps://instagram.com/WETHostel";
+            return `------------------------------------\n💬 GROUPS & CHATS 💬\n------------------------------------\n⭐Even if you don't join us, these are great resources!⭐\n\nPromoting is a big part of your job. Help us spread the word about our ${propName} online too! NEVER hard promote, we just mention ${targetWord} when it's relevant.\n\n== REQUIRED TO JOIN AND BE ACTIVE IN: ==\nHOSTELWORLD CHAT: join on the app with your booking.\n\nINSTAGRAM: https://tinyurl.com/FMPIGChat\n\nWHATSAPP: https://tinyurl.com/FMPSiteChat & https://tinyurl.com/FullMoonChat\n\n== FOLLOW OUR SOCIALS: ==\nhttps://www.tiktok.com/@wetpoolparty\nhttps://instagram.com/WETPoolParty${extraSocial}\nhttps://instagram.com/FullMoonWeek\nhttps://instagram.com/FullMoonParty.Thailand\n\n🔗 MORE RESOURCES: 🔗\nhttps://www.wildandwandering.com/links#h.3ocvvd04j9x - tons of travel chats!\n\nWhen you confirm, we will provide more useful social media & travel links too! Let us know if you'd like to join us!`;
+        }
 
         const DATE_EXPLAIN_HEADER = `📍DAY 1: Latest Arrival Date\n😴 DAY 2: Relax, Possible Light Promo\n📅 DAY 3: Schedule Created, Possible Light Promo\n📋 DAY 4: Training, Possible Light Promo\n🎉 DAYS 5&6: Work Shifts for 24-Hour Parties\n🌕 DAY 7: Full Moon Party, Work Shifts\n🎉 DAYS 8&9: Work Shifts for 24-Hour Parties\n🩹 DAY 10: Recovery Day, Final Tasks\n👋 DAY 11: Earliest Departure Date\n\n`;
 
@@ -280,7 +257,6 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim())) return dateStr.trim();
             
             const months = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-            
             const match = dateStr.match(/([a-zA-Z]{3})|(\d{4})|(\d{1,2})/g);
             if (!match) return null;
             
@@ -291,18 +267,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 else if (part.length <= 2) d = part.padStart(2, '0');
             });
             
-            if (m && d && y) return `${y}-${m}-${d}`;
-            
-            let parts = dateStr.split(/[\/\s,]+/);
-            if (parts.length >= 2) {
-                const mf = months[parts[0].substring(0,3)];
-                if(mf) {
-                    const df = parts[1].padStart(2, '0');
-                    const yf = parts[2] || new Date().getFullYear().toString();
-                    return `${yf}-${mf}-${df}`;
-                }
-            }
-            return null;
+            return (m && d && y) ? `${y}-${m}-${d}` : null;
         }
 
         function getConfirmDates() {
@@ -313,74 +278,42 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             
             if (volState.startDate && volState.endDate) {
                 const [sy, sm, sd] = volState.startDate.split('-').map(Number);
-                
                 const arrival = new Date(sy, sm - 1, sd, 12, 0, 0); 
-
                 const arrivalPlus1 = new Date(arrival); arrivalPlus1.setDate(arrival.getDate() + 1);
                 const arrivalPlus2 = new Date(arrival); arrivalPlus2.setDate(arrival.getDate() + 2);
 
-                // WET BDC - Date of arrival
                 wet_bdc_in = getLocalDateString(arrival);
                 wet_bdc_out = getLocalDateString(arrivalPlus1);
-
-                // SWIMS BDC - Day after arrival
                 swims_bdc_in = getLocalDateString(arrivalPlus1);
                 swims_bdc_out = getLocalDateString(arrivalPlus2);
 
                 if (volState.noFullMoon) {
-                    wet_hw_in = wet_bdc_in;
-                    wet_hw_out = wet_bdc_out;
-
-                    swims_hw_in = swims_bdc_in;
-                    swims_hw_out = swims_bdc_out;
+                    wet_hw_in = wet_bdc_in; wet_hw_out = wet_bdc_out;
+                    swims_hw_in = swims_bdc_in; swims_hw_out = swims_bdc_out;
                 } else {
                     let matchedShift = null;
-                    let allShifts = [];
-                    for (let range of FMW_RANGES) {
-                        allShifts.push(...range.partyStarts);
-                    }
-                    allShifts.sort();
+                    let allShifts = FMW_RANGES.flatMap(r => r.partyStarts).sort();
 
-                    for (let sStr of allShifts) {
-                        if (sStr >= volState.startDate && sStr <= volState.endDate) {
-                            matchedShift = sStr;
-                            break;
-                        }
-                    }
+                    matchedShift = allShifts.find(s => s >= volState.startDate && s <= volState.endDate);
 
                     if (!matchedShift) {
-                        for (let range of FMW_RANGES) {
-                            if (volState.startDate <= range.end && volState.endDate >= range.start) {
-                                matchedShift = range.partyStarts[0];
-                                break;
-                            }
-                        }
+                        const r = FMW_RANGES.find(range => volState.startDate <= range.end && volState.endDate >= range.start);
+                        if (r) matchedShift = r.partyStarts[0];
                     }
 
                     if (matchedShift) {
                         const [my, mm, md] = matchedShift.split('-').map(Number);
                         const partyStart = new Date(my, mm - 1, md, 12, 0, 0);
-                        
-                        // Full Moon Party is 2 days after partyStart
-                        const fmpDate = new Date(partyStart);
-                        fmpDate.setDate(fmpDate.getDate() + 2);
+                        const fmpDate = new Date(partyStart); fmpDate.setDate(fmpDate.getDate() + 2);
 
-                        // WET HW - 2 days before Full Moon Party
-                        const wetHwInDate = new Date(fmpDate);
-                        wetHwInDate.setDate(fmpDate.getDate() - 2);
+                        const wetHwInDate = new Date(fmpDate); wetHwInDate.setDate(fmpDate.getDate() - 2);
                         wet_hw_in = getLocalDateString(wetHwInDate);
-                        
-                        const wetHwOutDate = new Date(wetHwInDate); 
-                        wetHwOutDate.setDate(wetHwInDate.getDate() + 1);
+                        const wetHwOutDate = new Date(wetHwInDate); wetHwOutDate.setDate(wetHwInDate.getDate() + 1);
                         wet_hw_out = getLocalDateString(wetHwOutDate);
 
-                        // SWIMS HW - 1 week (7 days) before Full Moon Party
-                        const swimsHwInDate = new Date(fmpDate);
-                        swimsHwInDate.setDate(fmpDate.getDate() - 7);
+                        const swimsHwInDate = new Date(fmpDate); swimsHwInDate.setDate(fmpDate.getDate() - 7);
                         swims_hw_in = getLocalDateString(swimsHwInDate);
-                        
-                        const swimsHwOutDate = new Date(swimsHwInDate);
-                        swimsHwOutDate.setDate(swimsHwInDate.getDate() + 1);
+                        const swimsHwOutDate = new Date(swimsHwInDate); swimsHwOutDate.setDate(swimsHwInDate.getDate() + 1);
                         swims_hw_out = getLocalDateString(swimsHwOutDate);
                     }
                 }
@@ -400,21 +333,15 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 let minDiff = Infinity;
                 r.partyStarts.forEach(p => {
                     const diff = Math.abs(new Date(p) - ci);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        partyStart = p;
-                    }
+                    if (diff < minDiff) { minDiff = diff; partyStart = p; }
                 });
             }
-            
             if (!partyStart) return null;
             
-            const psDate = new Date(partyStart);
-            psDate.setDate(psDate.getDate() + 2);
+            const psDate = new Date(partyStart); psDate.setDate(psDate.getDate() + 2);
             const fmpISO = getLocalDateString(psDate);
             
             const fmwDetailsMap = {
-                // 2026
                 "2026-06-01": { fmwName: "June", partyDates: "30-3rd", fmpDate: "1Jun", extra: ", Visakha Bucha Buddha Day 31st" },
                 "2026-06-29": { fmwName: "June2", partyDates: "27-1st", fmpDate: "29Jun", extra: "" },
                 "2026-07-31": { fmwName: "July", partyDates: "29Jul-2Aug", fmpDate: "31Jul", extra: ", Asalha Bucha & Buddhist Lent Buddha Day 29th & 30th" },
@@ -424,8 +351,6 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 "2026-11-24": { fmwName: "November", partyDates: "22-26th", fmpDate: "24Nov", extra: "" },
                 "2026-12-24": { fmwName: "December", partyDates: "22-26th", fmpDate: "24Dec", extra: "" },
                 "2026-12-31": { fmwName: "New Year's", partyDates: "29-2nd", fmpDate: "31Dec", extra: "" },
-                
-                // 2027
                 "2027-01-22": { fmwName: "January", partyDates: "20-24th", fmpDate: "22Jan", extra: "" },
                 "2027-02-22": { fmwName: "February", partyDates: "20-24th", fmpDate: "22Feb", extra: ", Makha Bucha Buddha Day 21st" },
                 "2027-03-22": { fmwName: "March", partyDates: "20-24th", fmpDate: "22Mar", extra: "" },
@@ -441,9 +366,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 "2027-12-31": { fmwName: "New Year's", partyDates: "29-2nd", fmpDate: "31Dec", extra: "" }
             };
             
-            if (fmwDetailsMap[fmpISO]) {
-                return fmwDetailsMap[fmpISO];
-            }
+            if (fmwDetailsMap[fmpISO]) return fmwDetailsMap[fmpISO];
             
             const monthsShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
             const fmpDayStr = psDate.getDate() + monthsShort[psDate.getMonth()];
@@ -455,37 +378,27 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             let fmwName = r.month.charAt(0) + r.month.slice(1).toLowerCase();
             if (fmwName.includes('&')) fmwName = fmwName.split('&')[0].trim();
             
-            return {
-                fmwName: fmwName,
-                partyDates: partyDates,
-                fmpDate: fmpDayStr,
-                extra: ""
-            };
+            return { fmwName, partyDates, fmpDate: fmpDayStr, extra: "" };
         }
 
         function calculateVolunteerDates(startISO, endISO) {
             let arrivalBad = false, departureBad = false, hasOverlap = false, hasArtWindow = false;
-            
             if (!startISO || !endISO) return { arrivalBad, departureBad, noFullMoon: true, hasArtWindow };
 
             const todayISO = getLocalDateString(new Date());
             const activeRanges = FMW_RANGES.filter(r => r.start >= todayISO);
             
             activeRanges.forEach(range => {
-                const rStartStr = range.start;
-                const rEndStr = range.end;
-                
-                if (startISO <= rEndStr && endISO >= rStartStr) {
+                if (startISO <= range.end && endISO >= range.start) {
                     hasOverlap = true;
-                    if (startISO > rStartStr) arrivalBad = true;
-                    if (endISO < rEndStr) departureBad = true;
+                    if (startISO > range.start) arrivalBad = true;
+                    if (endISO < range.end) departureBad = true;
                 }
             });
 
             let maxWindow = 0, currentWindow = 0;
             const [sy, sm, sd] = startISO.split('-').map(Number);
             const [ey, em, ed] = endISO.split('-').map(Number);
-            
             const startObj = new Date(sy, sm - 1, sd, 12, 0, 0);
             const endObj = new Date(ey, em - 1, ed, 12, 0, 0);
 
@@ -505,8 +418,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             else if (type === 'end') volState.endDate = val;
 
             if (volState.startDate && volState.endDate) {
-                const dateFlags = calculateVolunteerDates(volState.startDate, volState.endDate);
-                Object.assign(volState, dateFlags);
+                Object.assign(volState, calculateVolunteerDates(volState.startDate, volState.endDate));
             } else {
                 Object.assign(volState, { arrivalBad: false, departureBad: false, noFullMoon: true, hasArtWindow: false });
             }
@@ -523,15 +435,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             lastParsedData = parseData(val);
             if (lastParsedData) {
                 if (lastParsedData.type === 'volunteer') {
-                    volState.name = lastParsedData.name;
-                    volState.role = lastParsedData.role;
-                    volState.property = lastParsedData.property;
-                    volState.arrivalBad = lastParsedData.arrivalBad;
-                    volState.departureBad = lastParsedData.departureBad;
-                    volState.noFullMoon = lastParsedData.noFullMoon;
-                    volState.hasArtWindow = lastParsedData.hasArtWindow;
-                    volState.startDate = lastParsedData.startDate;
-                    volState.endDate = lastParsedData.endDate;
+                    Object.assign(volState, lastParsedData);
                     if (viewMode === 'parser' || viewMode === 'reply') setViewMode('vol-request');
                 } else {
                     quoteState.guestName = lastParsedData.firstName || 'Guest';
@@ -539,7 +443,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                     quoteState.nights = lastParsedData.nights || 1;
                     quoteState.checkinISO = lastParsedData.checkinISO || '';
                     quoteState.checkoutISO = lastParsedData.checkoutISO || '';
-                    if (viewMode === 'vol-request' || viewMode === 'vol-confirm' || viewMode === 'vol-followup') setViewMode('parser');
+                    if (['vol-request', 'vol-confirm', 'vol-followup'].includes(viewMode)) setViewMode('parser');
                 }
             }
             renderResults();
@@ -565,11 +469,8 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             const cleanText = text.replace(/[\u202a\u202b\u202c\u202d\u202e]/g, "");
 
             const volPatterns = [
-                /(.*?)\s+wants to stay/i, 
-                /(.*?)\s+has applied/i, 
-                /(.*?)\s+have applied/i,
-                /(.*?)\s+applied for/i,
-                /(.*?)\s+(?:has|have)?\s*confirmed\s+(?:his|her|their|its)?\s*stay/i
+                /(.*?)\s+wants to stay/i, /(.*?)\s+has applied/i, /(.*?)\s+have applied/i,
+                /(.*?)\s+applied for/i, /(.*?)\s+(?:has|have)?\s*confirmed\s+(?:his|her|their|its)?\s*stay/i
             ];
             let volName = "";
             for (let pattern of volPatterns) {
@@ -591,22 +492,12 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
         function parseVolunteer(cleanText, volName) {
             let name = volName.split(" wants")[0].trim() || "";
-            let datesMatch = cleanText.match(/Ideal dates:\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*until\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i);
-            
-            if (!datesMatch) {
-                datesMatch = cleanText.match(/Arrive on\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*and leave on\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i);
-            }
-            if (!datesMatch) {
-                datesMatch = cleanText.match(/from\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*to\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i);
-            }
+            let datesMatch = cleanText.match(/Ideal dates:\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*until\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i)
+                || cleanText.match(/Arrive on\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*and leave on\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i)
+                || cleanText.match(/from\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})\s*to\s*([A-Z][a-z]{2}\/\d{1,2}\/\d{4})/i);
 
-            let startISO = "", endISO = "";
-            
-            if (datesMatch) {
-                startISO = convertToISO(datesMatch[1]);
-                endISO = convertToISO(datesMatch[2]);
-            }
-            
+            let startISO = datesMatch ? convertToISO(datesMatch[1]) : "";
+            let endISO = datesMatch ? convertToISO(datesMatch[2]) : "";
             const dateFlags = calculateVolunteerDates(startISO, endISO);
             
             let property = 'wet';
@@ -620,8 +511,6 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 role = 'art';
             } else if (lowerText.includes('online') || lowerText.includes('social media') || lowerText.includes('grow our social media')) {
                 role = 'social';
-            } else if (lowerText.includes('bring the social') || lowerText.includes('upload a new cover')) {
-                role = 'standard';
             }
             
             return { type: 'volunteer', name, role, property, ...dateFlags, startDate: startISO, endDate: endISO };
@@ -653,9 +542,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 const idx = lines.findIndex(l => l.toLowerCase().replace(/[^a-z]/g,'').includes(lbl.toLowerCase().replace(/[^a-z]/g,'')));
                 if (idx === -1) return "";
                 const currentLineClean = lines[idx].split(new RegExp(lbl + ':?', 'i')).pop().trim();
-                if (currentLineClean.length > 2) return currentLineClean;
-                if (lines[idx + 1]) return lines[idx + 1];
-                return "";
+                return currentLineClean.length > 2 ? currentLineClean : (lines[idx + 1] || "");
             };
 
             const name = findLabelValueExt('Guest name');
@@ -699,9 +586,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 const idx = lines.findIndex(l => l.toLowerCase().replace(/[^a-z]/g,'').includes(lbl.toLowerCase().replace(/[^a-z]/g,'')));
                 if (idx === -1) return "";
                 const currentLineClean = lines[idx].split(new RegExp(lbl + ':?', 'i')).pop().trim();
-                if (currentLineClean.length > 2) return currentLineClean;
-                if (lines[idx + 1]) return lines[idx + 1];
-                return "";
+                return currentLineClean.length > 2 ? currentLineClean : (lines[idx + 1] || "");
             };
 
             const isSnippet = lines.length < 10 && lines.some(l => /\d+\s+guests?/.test(l));
@@ -737,9 +622,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             if (fullName.includes('·')) fullName = findPattern(/About\s+([A-Z][a-zà-ÿ]+\s+[A-Z][a-zà-ÿ]+)/i) || lines[0];
             
             const askTripMatch = cleanTextForParsing.match(/^(.*?)\s+asked\s+about\s+a\s+trip/i);
-            if (askTripMatch) {
-                fullName = askTripMatch[1].trim();
-            }
+            if (askTripMatch) fullName = askTripMatch[1].trim();
 
             const nameParts = fullName.split(' ');
             const locIdx = lines.findIndex(l => l.includes(', ') && /[A-Z]{2}$/.test(l));
@@ -754,19 +637,14 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 if (l === 'guests' || l === 'total guests') {
                     if (lines[i+1]) {
                         const val = parseInt(lines[i+1].trim());
-                        if (!isNaN(val) && val > 0) {
-                            guestCount = val;
-                            guestFound = true;
-                            break;
-                        }
+                        if (!isNaN(val) && val > 0) { guestCount = val; guestFound = true; break; }
                     }
                 }
             }
             if (!guestFound) {
                 const gMatch = cleanTextForParsing.match(/(\d+)\s*(?:guests?|adults?|people|pax)/i);
-                if (gMatch) {
-                    guestCount = parseInt(gMatch[1]) || 1;
-                } else {
+                if (gMatch) guestCount = parseInt(gMatch[1]) || 1;
+                else {
                     const fallbackGuests = parseInt(findLabelValueExt('Guests'));
                     if (!isNaN(fallbackGuests)) guestCount = fallbackGuests;
                 }
@@ -783,11 +661,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 for (let i = 0; i <= 3; i++) {
                     if (lines[checkinLabelIdx + i]) {
                         const yrM = lines[checkinLabelIdx + i].match(/\b(202\d)\b/);
-                        if (yrM) {
-                            year = parseInt(yrM[1]);
-                            yearFound = true;
-                            break;
-                        }
+                        if (yrM) { year = parseInt(yrM[1]); yearFound = true; break; }
                     }
                 }
             }
@@ -796,10 +670,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 for (let m of matches) {
                     const idx = m.index;
                     const pre = cleanTextForParsing.substring(Math.max(0, idx - 30), idx);
-                    if (!pre.toLowerCase().includes('joined')) {
-                        year = parseInt(m[1]);
-                        break;
-                    }
+                    if (!pre.toLowerCase().includes('joined')) { year = parseInt(m[1]); break; }
                 }
             }
 
@@ -872,21 +743,20 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 return `⚠️ ERROR: INVALID TOGGLE COMBINATION ⚠️\n\nYou selected 'Full?' or 'Discount?' for an ART application. We are never fully booked between Full Moons. Please uncheck the 'Full?' or 'Discount?' toggles to generate the correct response for this artist.`;
             }
 
-            // Property Routing: SWIMS Beach Resort
             if (property === 'swims') {
                 if (fullyBooked) {
-                    return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested at SWIMS Resort. But every month we have at least one or two cancellations or no-shows, so let us know if you'd be available last-minute for a stay that includes at least one of these periods:\n\n${getCalendarText('simple')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you if space opens up! 😍\n\n${SWIMS_STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS_SWIMS}`;
+                    return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested at SWIMS Resort. But every month we have at least one or two cancellations or no-shows, so let us know if you'd be available last-minute for a stay that includes at least one of these periods:\n\n${getCalendarText('simple')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you if space opens up! 😍\n\n${SWIMS_STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${getFooterLinks('swims')}`;
                 }
 
                 if (discountStay) {
-                    return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But we've been getting TONS of requests so we thought we could offer a 50% discount on SWIMS Beach Resort stays in exchange for very part-time volunteering, if you are available for the entire Full Moon Week from 3 days before Full Moon Party to 3 days after.\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n🏖 SWIMS: a Social Beach Resort🏖 is our beachfront property aimed at bringing a social vibe to a beautiful resort setup. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe here!\n\nWe ask you for 3 hours per day volunteering for 5 days of Full Moon Week on promo tasks - the fun interactive stuff:\n\n📸 Take pics/vids for social media later\n🎥 Tag us on social media\n✍ Leave Google & TripAdvisor reviews\n💬 Mention SWIMS & WET on Hostelworld chat & other chats\n🎫 Flyer around town to promote our events & discount ticket packages\n\nExtra perks:\n🎉 Discount tickets/free taxi to major parties\n🥃 Free shots (for you & them):\n     - every group of 3+ you bring in!\n     - anyone tagging us on social media!\n     - anyone leaving a good, honest Google or TripAdvisor review!\n\n😍If that sounds like something you'd be up for and we can DEPEND on you, let us know and we can work out dates & a half-price booking for you!😍\n\n${FOOTER_LINKS_SWIMS}`;
+                    return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But we've been getting TONS of requests so we thought we could offer a 50% discount on SWIMS Beach Resort stays in exchange for very part-time volunteering, if you are available for the entire Full Moon Week from 3 days before Full Moon Party to 3 days after.\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n🏖 SWIMS: a Social Beach Resort🏖 is our beachfront property aimed at bringing a social vibe to a beautiful resort setup. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe here!\n\nWe ask you for 3 hours per day volunteering for 5 days of Full Moon Week on promo tasks - the fun interactive stuff:\n\n📸 Take pics/vids for social media later\n🎥 Tag us on social media\n✍ Leave Google & TripAdvisor reviews\n💬 Mention SWIMS & WET on Hostelworld chat & other chats\n🎫 Flyer around town to promote our events & discount ticket packages\n\nExtra perks:\n🎉 Discount tickets/free taxi to major parties\n🥃 Free shots (for you & them):\n     - every group of 3+ you bring in!\n     - anyone tagging us on social media!\n     - anyone leaving a good, honest Google or TripAdvisor review!\n\n😍If that sounds like something you'd be up for and we can DEPEND on you, let us know and we can work out dates & a half-price booking for you!😍\n\n${getFooterLinks('swims')}`;
                 }
 
                 if (unablePreapprove) {
                     if (role === 'art') {
                         const artWPIntro = `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove, as long as your dates don't conflict with any dates you don't want to work. So let us know ASAP if you'd be interested in joining us!\n\n`;
-                        if (noFullMoon) return `${artWPIntro}${SWIMS_ART_TASKS_BODY}\n\n${BUMMER_LIGHT}\n\n${FOOTER_LINKS_SWIMS}`;
-                        return `${artWPIntro}${SWIMS_ART_TASKS_BODY}\n\nBUT, your stay includes Full Moon Week dates. During that time there's NO time for art and if you stay with us, you'll be doing resort, social & party promotion work for those 5 or 6 days.\n\nIf you DO NOT want to do that, please let us know and change your dates to NOT include these dates:\n\n${getCalendarText('simple')}\n\nIf you DO want to join in the Full Moon Week volunteering, we'll include all the details below:\n\n${SWIMS_STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS_SWIMS}`;
+                        if (noFullMoon) return `${artWPIntro}${SWIMS_ART_TASKS_BODY}\n\n${BUMMER_LIGHT}\n\n${getFooterLinks('swims')}`;
+                        return `${artWPIntro}${SWIMS_ART_TASKS_BODY}\n\nBUT, your stay includes Full Moon Week dates. During that time there's NO time for art and if you stay with us, you'll be doing resort, social & party promotion work for those 5 or 6 days.\n\nIf you DO NOT want to do that, please let us know and change your dates to NOT include these dates:\n\n${getCalendarText('simple')}\n\nIf you DO want to join in the Full Moon Week volunteering, we'll include all the details below:\n\n${SWIMS_STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${getFooterLinks('swims')}`;
                     }
 
                     const swimsIntro = `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove. So let us know ASAP if you'd be interested in joining us at SWIMS Beach Resort!\n\n`;
@@ -900,7 +770,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                         : `If you will be here for Full Moon Week, we require 🗓5 LONG DAYS of work🗓 - we will make sure you get more than enough time off before & after to make up for it! It's very quiet in town between Full Moons, so you will be able to chill or explore the islands, just be active in the staff chat.`;
                     
                     let bummer = noFullMoon ? BUMMER_LIGHT : BUMMER_FULL;
-                    return `${swimsIntro}------------------------------------\n🏖 SWIMS: A SOCIAL BEACH RESORT 🏖\n------------------------------------\n💦SWIMS: a Social Beach Resort🏖 is a new property aimed at bringing the social vibe of a party hostel to a beautiful beach resort. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe here!\n\n${swimsBody}\n\n------------------------------------\n🗓 TIMINGS & WORK EXPECTATIONS 🗓\n------------------------------------\n${timings}\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍\n\n${bummer}\n\n${FOOTER_LINKS_SWIMS}`;
+                    return `${swimsIntro}------------------------------------\n🏖 SWIMS: A SOCIAL BEACH RESORT 🏖\n------------------------------------\n💦SWIMS: a Social Beach Resort🏖 is a new property aimed at bringing the social vibe of a party hostel to a beautiful beach resort. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe here!\n\n${swimsBody}\n\n------------------------------------\n🗓 TIMINGS & WORK EXPECTATIONS 🗓\n------------------------------------\n${timings}\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍\n\n${bummer}\n\n${getFooterLinks('swims')}`;
                 }
 
                 if ((arrivalBad || departureBad) && !dateOverride) {
@@ -910,7 +780,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                     let adjustmentText = "If you are able to adjust your dates to include at least one of these full periods (or request dates completely outside of Full Moon Week), we can host you!";
                     if (role === 'art') adjustmentText = "If you are able to adjust your dates to not include one of these periods if you want to ONLY do art, or to include the full period if you want to do resort/party work also, we can host you!";
 
-                    return `${hi} thanks for your request, but you've chosen dates that ${part} a Full Moon Week period, which we can't accommodate. ${adjustmentText}\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n------------------------------------\n🏖 SWIMS: A SOCIAL BEACH RESORT 🏖\n------------------------------------\n💦SWIMS: a Social Beach Resort🏖 is a new property aimed at bringing the social vibe of a party hostel to a beautiful beach resort. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe here!\n\n${swimsBody}\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS_SWIMS}`;
+                    return `${hi} thanks for your request, but you've chosen dates that ${part} a Full Moon Week period, which we can't accommodate. ${adjustmentText}\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n------------------------------------\n🏖 SWIMS: A SOCIAL BEACH RESORT 🏖\n------------------------------------\n💦SWIMS: a Social Beach Resort🏖 is a new property aimed at bringing the social vibe of a party hostel to a beautiful beach resort. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe here!\n\n${swimsBody}\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍\n\n${BUMMER_FULL}\n\n${getFooterLinks('swims')}`;
                 }
 
                 let swimsBody = (role === 'social') ? SWIMS_SOCIAL_TASKS_BODY : SWIMS_STANDARD_TASKS_BODY;
@@ -925,32 +795,30 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                     : `If you will be here for Full Moon Week, we require 🗓5 LONG DAYS of work🗓 - we will make sure you get more than enough time off before & after to make up for it! It's very quiet in town between Full Moons, so you will be able to chill or explore the islands, just be active in the staff chat.`;
                 
                 let bummer = noFullMoon ? BUMMER_LIGHT : BUMMER_FULL;
-
                 let timingBlock = fmwTimingText ? `${monthText}\n\n${fmwTimingText}` : monthText;
 
-                return `${hi} thanks for your request! We get tons of requests (apologies for any slow response), so we've made this message about what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦SWIMS: a Social Beach Resort🏖 is a new property aimed at bringing the social vibe of a party hostel to a beautiful beach resort. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe to this new resort. \n\n${swimsBody}\n\n${timingBlock}\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍\n\n${bummer}\n\n${FOOTER_LINKS_SWIMS}`;
+                return `${hi} thanks for your request! We get tons of requests (apologies for any slow response), so we've made this message about what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦SWIMS: a Social Beach Resort🏖 is a new property aimed at bringing the social vibe of a party hostel to a beautiful beach resort. We already run the infamous WET Pool Party and are looking to create the same friendliness and vibe to this new resort. \n\n${swimsBody}\n\n${timingBlock}\n\nINCLUDED: \n🛏 Dorm bed\n🍹 Free & discount booze during parties\n🎉 Party guestlists\n🛵 Motorbike to promote (only occasionally)\n\nNOT INCLUDED: \n🍚 Restaurant/meals (you can use the staff kitchen RESPECTFULLY)\n🏨 Private rooms (can discount one outside FMW)\n\n😍 If this sounds like you are a match for what we do and what we require, we'd love to have you with us! 😍\n\n${bummer}\n\n${getFooterLinks('swims')}`;
             }
 
-            // Classic Property Routing: WET Pool Party
             if (fullyBooked) {
-                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But every month we have at least one or two cancellations or no-shows, so let us know if you'd be available last-minute for a stay that includes at least one of these periods:\n\n${getCalendarText('simple')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you if space opens up! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But every month we have at least one or two cancellations or no-shows, so let us know if you'd be available last-minute for a stay that includes at least one of these periods:\n\n${getCalendarText('simple')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you if space opens up! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
             }
 
             if (discountStay) {
-                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But we've been getting TONS of requests so we thought we could offer a 50% discount on Full Moon Party stays in exchange for very part-time volunteering, if you are available for the entire Full Moon Week from 3 days before Full Moon Party to 3 days after.\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes!\n\nWe have an orientation 3 days before Full Moon Party, and then we ask you for 3 hours per day volunteering for the next 5 days. You will only work on promo tasks - the fun interactive stuff:\n\n📸 Take pics/vids for social media later\n🎥 Tag us on social media\n✍ Leave Google & TripAdvisor reviews\n💬 Mention our parties on Hostelworld chat & other chats\n🎫 Flyer around town to promote our party & discount ticket packages\n\n😍If that sounds like something you'd be up for and we can DEPEND on you, let us know and we can work out dates & a half-price booking for you!😍\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request. As of now, we are fully booked with volunteers for the Full Moon Week you requested. But we've been getting TONS of requests so we thought we could offer a 50% discount on Full Moon Party stays in exchange for very part-time volunteering, if you are available for the entire Full Moon Week from 3 days before Full Moon Party to 3 days after.\n\n------------------------------------\n🎉 WHO WE ARE, WHAT WE DO! 🎉\n------------------------------------\n💦WET Pool Party💦 is the biggest PRE-PARTY & HOSTEL at Full Moon Week (FMW). We are organized chaos, so we look for 🚨HARDWORKING, SELF-MOTIVATED, FLEXIBLE, RELIABLE, and PROACTIVE volunteers🚨 to engage our guests and bring in partiers to build the best vibes!\n\nWe have an orientation 3 days before Full Moon Party, and then we ask you for 3 hours per day volunteering for the next 5 days. You will only work on promo tasks - the fun interactive stuff:\n\n📸 Take pics/vids for social media later\n🎥 Tag us on social media\n✍ Leave Google & TripAdvisor reviews\n💬 Mention our parties on Hostelworld chat & other chats\n🎫 Flyer around town to promote our party & discount ticket packages\n\n😍If that sounds like something you'd be up for and we can DEPEND on you, let us know and we can work out dates & a half-price booking for you!😍\n\n${getFooterLinks('wet')}`;
             }
 
             if (unablePreapprove) {
                 if (role === 'art') {
                     const artWPIntro = `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove, as long as your dates don't conflict with the Full Moon Week dates we listed in our description. So let us know ASAP if you'd be interested in joining us!\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n`;
                     
-                    if (noFullMoon) return `${artWPIntro}${ART_PURE_BODY}\n\n${BUMMER_LIGHT}\n\n${FOOTER_LINKS}`;
-                    if (hasArtWindow) return `${artWPIntro}${ART_PURE_BODY}\n\n${ART_HYBRID_CLAUSE}${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
-                    return `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove.\n\nHowever, your stay overlaps with Full Moon Week so there is no time to do art during the party period. If you JUST want to make art, please request dates outside of the following. If you'd like to make art AND help with hostel/party work during Full Moon Week, please request dates that include at least one of the periods below PLUS at least one week before or after those dates to do art!\n\n${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                    if (noFullMoon) return `${artWPIntro}${ART_PURE_BODY}\n\n${BUMMER_LIGHT}\n\n${getFooterLinks('wet')}`;
+                    if (hasArtWindow) return `${artWPIntro}${ART_PURE_BODY}\n\n${ART_HYBRID_CLAUSE}${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
+                    return `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove.\n\nHowever, your stay overlaps with Full Moon Week so there is no time to do art during the party period. If you JUST want to make art, please request dates outside of the following. If you'd like to make art AND help with hostel/party work during Full Moon Week, please request dates that include at least one of the periods below PLUS at least one week before or after those dates to do art!\n\n${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
                 }
 
                 const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
-                return `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove, as long as you followed the Full Moon Week dates we listed in our description. So let us know ASAP if you'd be interested in joining us!\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request! Worldpackers prevents us from pre-approving you if you are booked elsewhere. You'd need to cancel and then we can preapprove, as long as you followed the Full Moon Week dates we listed in our description. So let us know ASAP if you'd be interested in joining us!\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
             }
 
             if ((arrivalBad || departureBad) && !dateOverride) {
@@ -959,24 +827,24 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 let adjustmentText = "If you are able to adjust your dates to include at least one of these periods, we can host you!";
                 if (role === 'art') adjustmentText = "If you are able to adjust your dates to not include one of these periods if you want to ONLY do art, or to include the full period if you want to do hostel/party work also, we can host you!";
 
-                return `${hi} thanks for your request, but you've chosen dates that ${part} a Full Moon Week period, which we can't accommodate. ${adjustmentText}\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request, but you've chosen dates that ${part} a Full Moon Week period, which we can't accommodate. ${adjustmentText}\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
             }
 
             if (role === 'art') {
-                if (noFullMoon) return `${hi} thanks for your request! ${ART_PURE_BODY}\n\n${BUMMER_LIGHT}\n\n${FOOTER_LINKS}`;
-                if (hasArtWindow) return `${hi} thanks for your request! ${ART_PURE_BODY}\n\n${ART_HYBRID_CLAUSE}${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
-                return `${hi} thanks for your request, we'd love to have art but your stay overlaps with Full Moon Week so there is no time to do art during the party period. If you JUST want to make art, please request dates outside of the following. If you'd like to make art AND help with hostel/party work during Full Moon Week, please request dates that include at least one of the periods below PLUS at least one week before or after those dates to do art!\n\n${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                if (noFullMoon) return `${hi} thanks for your request! ${ART_PURE_BODY}\n\n${BUMMER_LIGHT}\n\n${getFooterLinks('wet')}`;
+                if (hasArtWindow) return `${hi} thanks for your request! ${ART_PURE_BODY}\n\n${ART_HYBRID_CLAUSE}${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
+                return `${hi} thanks for your request, we'd love to have art but your stay overlaps with Full Moon Week so there is no time to do art during the party period. If you JUST want to make art, please request dates outside of the following. If you'd like to make art AND help with hostel/party work during Full Moon Week, please request dates that include at least one of the periods below PLUS at least one week before or after those dates to do art!\n\n${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${STANDARD_TASKS_BODY}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
             }
 
             if (noFullMoon && !dateOverride && role !== 'art') {
                 const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
-                return `${hi} thanks for your request, but you've chosen dates that don't include a Full Moon Week period, which we can't accommodate. If you are able to adjust your dates to include at least one of these periods, we can host you!\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request, but you've chosen dates that don't include a Full Moon Week period, which we can't accommodate. If you are able to adjust your dates to include at least one of these periods, we can host you!\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
             }
 
             const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
             const intro = (role === 'social') ? `thanks for your request! We could use some help with social media, content, promotion, and marketing! We are looking for someone with skills at attracting people online and making sure our on-the-ground promotion team of volunteers are effective and reliable.\n\n` : `thanks for your request! We get tons of requests (apologies for any slow response), so we've made this message about what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n`;
 
-            return `${hi} ${intro}${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+            return `${hi} ${intro}${body}\n\n${BUMMER_FULL}\n\n${getFooterLinks('wet')}`;
         }
 
         function generateVolConfirmResponse() {
@@ -992,12 +860,9 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${swims_bdc_in}&checkout=${swims_bdc_out}&group_adults=1`;
             const swimsHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
 
-            let confirmSteps = "";
-            if (isNoDeposit) {
-                confirmSteps = `🚨1) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨2) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨3) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
-            } else {
-                confirmSteps = `🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep\n🚨2) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨3) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨5) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
-            }
+            let confirmSteps = isNoDeposit 
+                ? `🚨1) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨2) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨3) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`
+                : `🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep\n🚨2) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨3) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨5) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
 
             let refundMsg = isNoDeposit 
                 ? "Remember, EVERYTHING will be REFUNDED at the end of your stay as long as you completed your project/activities."
@@ -1018,12 +883,9 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${swims_bdc_in}&checkout=${swims_bdc_out}&group_adults=1`;
             const swimsHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
 
-            let confirmingBlock = "";
-            if (isNoDeposit) {
-                confirmingBlock = `🚨1) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨2) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨3) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
-            } else {
-                confirmingBlock = `🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep\n🚨2) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨3) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨5) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
-            }
+            let confirmingBlock = isNoDeposit
+                ? `🚨1) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨2) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨3) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`
+                : `🚨1) Click to make a 3000b deposit - https://tinyurl.com/VolDep\n🚨2) Make the cheapest 1-bed booking at WET Booking.com - ${wetBdcLink}\n🚨3) Make the cheapest 1-bed booking at WET Hostelworld - ${wetHwLink}\n🚨4) Make the cheapest 1-bed booking at SWIMS Booking.com - ${swimsBdcLink}\n🚨5) Make the cheapest 1-bed booking at SWIMS Hostelworld - ${swimsHwLink}`;
 
             let refundClause = isNoDeposit 
                 ? "Remember, EVERYTHING will be REFUNDED at the end of your stay as long as you completed your project/activities." 
@@ -1032,11 +894,9 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             return `${hi} we haven't received your bookings and/or deposit yet for your upcoming stay. Please note that without completing these steps, your hosting IS NOT guaranteed and you risk the chance of being turned away.\n\n------------------\nCONFIRMING\n------------------\nAs explained, your stay isn't guaranteed until the following is completed:\n\n${confirmingBlock}\n\n🚨🚨 In each booking, add the letter V after your last name, so we can identify you as a volunteer, i.e. "Bob Smith V". (DO NOT write that you a volunteer in the notes - remember it's not allowed in Thailand!) 🚨🚨\n\n${refundClause}\n\n💬 The Hostelworld app has group chats for guests ONLY. With your booking, you can mention the main WhatsApp and IG group chats, tell people to party with us, and answer questions about Full Moon (ask if you don't know!)\n\n---------\nCHATS\n---------\nYou MUST be active on these 4 groups:\n\n💬 https://tinyurl.com/WETVol - Volunteer Chat (any questions/problems, pics showing your work, guestlist requests, sharing content for social media)\n💬 https://tinyurl.com/WETChat - Guest Chat (share fun pics/videos, announce activities, invite guests to come participate)\n💬 https://tinyurl.com/FMPChat &\n💬 https://tinyurl.com/FMPSiteChat - The admins of both are friends but never directly advertise, just organically mention us and invite people to join\n\nYou should already be following our socials:\nhttps://www.tiktok.com/@wetpoolparty\nhttps://Instagram.com/WetPoolParty\nhttps://Instagram.com/WetHostel\nhttps://Instagram.com/SWIMSResort\nhttps://Instagram.com/FullMoonWeek\nhttps://Instagram.com/FullMoonParty.Thailand\n\n---------\nPlease complete your confirmation steps ASAP to guarantee your spot with us!`;
         }
 
-        // ==========================================
-        // REPLY GENERATOR (PRICE QUOTER) LOGIC
-        // ==========================================
         function updateQuote(field, val) { quoteState[field] = field === 'guestName' ? val : (parseFloat(val) || 0); renderResults(); }
         function openBookingLink(url) { window.open(url, '_blank'); setTimeout(() => { document.getElementById('tool-paste')?.focus(); }, 200); }
+        
         function generateBookingLinkHTML() {
             if (!quoteState.checkinISO || !quoteState.checkoutISO) return `<div class="py-2 text-[10px] text-center text-slate-400 bg-slate-50 border border-dashed rounded opacity-60">No Dates Detected for Link</div>`;
             const url = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${quoteState.checkinISO}&checkout=${quoteState.checkoutISO}&group_adults=${quoteState.guests}&group_children=0&hapos=1&no_rooms=1`;
@@ -1044,23 +904,14 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
         }
 
         function cleanPrice(priceStr) {
-            let cleaned = priceStr.trim();
-            // Remove non-numeric symbols except dots, commas and numbers
-            cleaned = cleaned.replace(/[^\d,.]/g, '');
-            // Check if there is only a dot or comma as thousands separator (e.g. 10.144 or 10,144)
+            let cleaned = priceStr.trim().replace(/[^\d,.]/g, '');
             if (cleaned.includes(',')) {
                 const parts = cleaned.split(',');
-                if (parts[parts.length - 1].length === 3) {
-                    cleaned = cleaned.replace(/,/g, '');
-                } else {
-                    cleaned = cleaned.replace(/,/g, '.');
-                }
+                cleaned = parts[parts.length - 1].length === 3 ? cleaned.replace(/,/g, '') : cleaned.replace(/,/g, '.');
             }
             if (cleaned.includes('.')) {
                 const parts = cleaned.split('.');
-                if (parts[parts.length - 1].length === 3) {
-                    cleaned = cleaned.replace(/\./g, '');
-                }
+                if (parts[parts.length - 1].length === 3) cleaned = cleaned.replace(/\./g, '');
             }
             return parseFloat(cleaned);
         }
@@ -1083,15 +934,14 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                     let match;
                     while ((match = regex.exec(cleanText)) !== null) {
                         let chunk = cleanText.substring(match.index, match.index + 1200);
-                        // Strip out dropdown parenthesized prices to avoid multiplying total room prices
-                        chunk = chunk.replace(/\([^)]*\)/g, '');
+                        const selectIdx = chunk.toLowerCase().indexOf("select");
+                        if (selectIdx !== -1) chunk = chunk.substring(0, selectIdx);
 
+                        chunk = chunk.replace(/\([^)]*\)/g, '');
                         const priceMatches = [...chunk.matchAll(/(?:THB|฿)\s*([\d,.]+)/gi)];
                         priceMatches.forEach(p => {
                             const val = cleanPrice(p[1]);
-                            if (!isNaN(val) && val > 0) {
-                                foundPrices.push(val);
-                            }
+                            if (!isNaN(val) && val > 0) foundPrices.push(val);
                         });
                     }
                     if (foundPrices.length > 0) break;
@@ -1106,12 +956,9 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             const s = (count, single, plural) => parseInt(count) === 1 ? single : plural;
             
             const fmw = getFmwDetails(quoteState.checkinISO, quoteState.checkoutISO);
-            let greeting = "";
-            if (fmw) {
-                greeting = `Hi ${guestName}! Thanks for requesting for ${fmw.fmwName} Full Moon Week (${fmw.partyDates}, FMP on ${fmw.fmpDate}${fmw.extra})! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.`;
-            } else {
-                greeting = `Hi ${guestName}! Thanks for requesting to chill with us between Full Moons when it's peaceful and quiet! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.`;
-            }
+            let greeting = fmw 
+                ? `Hi ${guestName}! Thanks for requesting for ${fmw.fmwName} Full Moon Week (${fmw.partyDates}, FMP on ${fmw.fmpDate}${fmw.extra})! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.`
+                : `Hi ${guestName}! Thanks for requesting to chill with us between Full Moons when it's peaceful and quiet! For ${g} ${s(g, 'guest', 'guests')}, staying ${n} ${s(n, 'night', 'nights')}, the following options are available.`;
 
             const getBudgetPrivate = () => {
                 if (g === 4) return 4 * b;
@@ -1145,31 +992,23 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
                 return 0;
             };
 
-            const getBudgetPrivateExtra = () => {
-                if (g <= 4) return 799;
-                if (g <= 6) return 1199;
-                return 1599;
-            };
+            const getBudgetPrivateExtra = () => (g <= 4 ? 799 : (g <= 6 ? 1199 : 1599));
 
-            let shortStayBlock = "";
-            if (n < 3) {
-                shortStayBlock = `\n\n🎉ALSO: Do you know Full Moon Party is a WEEKLONG event with at least FIVE days of all-night parties. Our 💦24-hour Pool Party preparty💦 starts 2 days before Full Moon night until 2 days after!\n\nCheck out @FullMoonWeek on IG for an idea of all the parties!\n\nThere are dozen of events, but the usual major line-up is:\n2⃣ DAYS BEFORE: Waterfall Festival, Utopia, 5-day WET Pool Party pre starts\n1⃣ DAY BEFORE: Jungle Experience, WET pre\n🌕FULL MOON PARTY 24 hours\n1⃣ DAY AFTER: WET FOAM Party\n2⃣ DAYS AFTER: Waterfall Festival, WET Karaoke pre\n\nPLUS many weeklies:\nFri - OXA Party, Lighthouse, PsyDay, Guy's Bar, Rasta Home\nSat - Eden, Seaside, Hollystone\nSun - Bambu, Sinewave DnB\nMon - Monday Madness\nTue - Lighthouse, PsyDay\n\nand MUCH MORE!\n\n--------------------\n🚨We HIGHLY recommend staying at least 3 or 4 days and offer super-cheap extensions! Let us know!`;
-            } else {
-                shortStayBlock = "\n\n😍";
-            }
+            let shortStayBlock = n < 3 
+                ? `\n\n🎉ALSO: Do you know Full Moon Party is a WEEKLONG event with at least FIVE days of all-night parties. Our 💦24-hour Pool Party preparty💦 starts 2 days before Full Moon night until 2 days after!\n\nCheck out @FullMoonWeek on IG for an idea of all the parties!\n\nThere are dozen of events, but the usual major line-up is:\n2⃣ DAYS BEFORE: Waterfall Festival, Utopia, 5-day WET Pool Party pre starts\n1⃣ DAY BEFORE: Jungle Experience, WET pre\n🌕FULL MOON PARTY 24 hours\n1⃣ DAY AFTER: WET FOAM Party\n2⃣ DAYS AFTER: Waterfall Festival, WET Karaoke pre\n\nPLUS many weeklies:\nFri - OXA Party, Lighthouse, PsyDay, Guy's Bar, Rasta Home\nSat - Eden, Seaside, Hollystone\nSun - Bambu, Sinewave DnB\nMon - Monday Madness\nTue - Lighthouse, PsyDay\n\nand MUCH MORE!\n\n--------------------\n🚨We HIGHLY recommend staying at least 3 or 4 days and offer super-cheap extensions! Let us know!`
+                : "\n\n😍";
 
             return `${greeting}\n\n฿🇹🇭 All prices in THB. Dorms are per person, private is whole room.\n\nAirBnB can only calculate 1 bed, not groups, upgrades, or special requests, so we try to provide details here for WETPoolParty.\n\n--------------------\n💦WET! Pool Party Hostel is a private compound, 3-minute walk from Full Moon Party beach. Famous for our 5-day Full Moon Week (IG @FullMoonWeek) 24-hour party, and relaxing chill vibes between Full Moons. \n\nOur pool (w/swim-up bar) is surrounded by garden lounge, DJ booth, games, and more. There we have all dorms:\n\n💲BUDGET - 4-10 beds, aircon, shared bathroom, louder area.\n🚺FEMALE - 8 beds, aircon, ensuite bathrooms, quieter area.\n#️⃣STANDARD - 6-10 beds, aircon, ensuite bathrooms, privacy curtains, quieter area.\n🛅SUPERIOR - 6-8 beds, aircon, ensuite bathrooms, privacy curtains, big lockers, quieter area.\n\n--------------------\n🛌 HOSTEL BEDS:\nBUDGET Dorm: ${f(b)} baht - ${f(g * b)} total, extra nights are ${f(exBudgetBed)} baht per person per night.\nSTANDARD Dorm: ${f(sRate)} baht - ${f(g * sRate)} total, extra nights ${f(exStandBed)} baht per person per night.\nSUPERIOR Dorm: ${f(sup)} baht - ${f(g * sup)} total, extra nights ${f(exSuperBed)} baht per person per night.\nFEMALE Dorm: ${f(fem)} baht - ${f(g * fem)} total, extra nights are ${f(exFemBed)} baht per person per night.\n\n🏩 HOSTEL DORMS FOR PRIVATE USE:\nBUDGET Dorm: ${f(getBudgetPrivate())} baht, extra nights ${getBudgetPrivateExtra()} baht per night.\nSTANDARD Dorm: ${f(getStandardPrivate())} baht, extra nights 1599 baht per night.\nSUPERIOR Dorm: ${f(getSuperiorPrivate())} baht, extra nights 1799 baht per night.\nFEMALE Dorm: ${f(getFemalePrivate())} baht, extra nights 1599 baht per night.\n\n--------------------\n🚨Please let us know if you would like us to book one of these options as we often sell out!${shortStayBlock}`;
         }
 
-        // ==========================================
-        // UI RENDERING
-        // ==========================================
         function renderResults() {
             const view = document.getElementById('results-view'); const empty = document.getElementById('empty-state');
-            if (!lastParsedData && viewMode !== 'vol-request' && viewMode !== 'vol-confirm' && viewMode !== 'vol-followup' && viewMode !== 'reply') { view.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+            if (!lastParsedData && !['vol-request', 'vol-confirm', 'vol-followup', 'reply'].includes(viewMode)) { 
+                view.classList.add('hidden'); empty.classList.remove('hidden'); return; 
+            }
             view.classList.remove('hidden'); empty.classList.add('hidden');
             
-            if (viewMode === 'vol-request' || viewMode === 'vol-confirm' || viewMode === 'vol-followup') renderVolunteerView(view);
+            if (['vol-request', 'vol-confirm', 'vol-followup'].includes(viewMode)) renderVolunteerView(view);
             else if (viewMode === 'reply') renderReplyView(view);
             else if (lastParsedData && lastParsedData.type === 'card') renderCardView(view);
             else renderFieldsView(view);
@@ -1179,10 +1018,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             const currentRoleText = viewMode === 'vol-confirm' ? 'CONFIRMATION' : (viewMode === 'vol-followup' ? 'FOLLOW-UP' : 'RESPONSE');
             const hasProblem = (volState.arrivalBad || volState.departureBad || (volState.property === 'wet' && volState.noFullMoon && volState.role !== 'art') || (volState.role === 'art' && !volState.noFullMoon && !volState.hasArtWindow)) && !volState.dateOverride;
             
-            let outputText = "";
-            if (viewMode === 'vol-confirm') outputText = generateVolConfirmResponse();
-            else if (viewMode === 'vol-followup') outputText = generateVolFollowupResponse();
-            else outputText = generateVolResponse();
+            let outputText = viewMode === 'vol-confirm' ? generateVolConfirmResponse() : (viewMode === 'vol-followup' ? generateVolFollowupResponse() : generateVolResponse());
 
             el.innerHTML = `
                 <div class="flex-1 p-2 flex flex-col gap-2">
@@ -1315,13 +1151,13 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             const btn = document.getElementById(`status-${id}`); if (btn) { 
                 btn.innerText = "COPIED!"; 
                 setTimeout(() => { 
-                    if(btn) btn.innerText = "COPY"; 
-                    if(id==='VOL') {
+                    if (btn) btn.innerText = "COPY"; 
+                    if (id === 'VOL') {
                         const lbl = viewMode === 'vol-confirm' ? 'CONFIRMATION' : (viewMode === 'vol-followup' ? 'FOLLOW-UP' : 'RESPONSE');
                         btn.innerText = "COPY " + lbl;
                     }
-                    if(id==='REPLY') btn.innerText = "COPY QUOTE"; 
-                    if(id==='CARD') btn.innerText = "COPY BLOCK"; 
+                    if (id === 'REPLY') btn.innerText = "COPY QUOTE"; 
+                    if (id === 'CARD') btn.innerText = "COPY BLOCK"; 
                 }, 1500); 
             }
         }
