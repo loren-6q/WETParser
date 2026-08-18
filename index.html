@@ -1045,7 +1045,9 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
         function cleanPrice(priceStr) {
             let cleaned = priceStr.trim();
+            // Remove non-numeric symbols except dots, commas and numbers
             cleaned = cleaned.replace(/[^\d,.]/g, '');
+            // Check if there is only a dot or comma as thousands separator (e.g. 10.144 or 10,144)
             if (cleaned.includes(',')) {
                 const parts = cleaned.split(',');
                 if (parts[parts.length - 1].length === 3) {
@@ -1066,26 +1068,33 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
         function runPriceFetcher() {
             const text = document.getElementById('tool-paste').value;
             if (!text) return;
-            const ROOM_MAP = [ { id: "female", match: "Female Dormitory" }, { id: "budget", match: "Bunk Bed in Mixed Dormitory" }, { id: "standard", match: "Single Bed in Mixed Dormitory" }, { id: "superior", match: "Single Bed in Dormitory Room" } ];
+            const ROOM_MAP = [
+                { id: "female", matches: ["FMP Female Dorm", "Female Dormitory", "Female Dorm", "Single Bed in Female"] },
+                { id: "budget", matches: ["FMP Budget Dorm", "Bunk Bed in Mixed Dormitory", "Budget Dormitory", "Budget Dorm"] },
+                { id: "standard", matches: ["FMP Standard Dorm", "Single Bed in Mixed Dormitory", "Standard Dormitory", "Standard Dorm"] },
+                { id: "superior", matches: ["FMP Superior Dorm", "Single Bed in Dormitory Room", "Superior Dormitory", "Superior Dorm"] }
+            ];
             const cleanText = text.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, " ").replace(/\s+/g, ' ');
+            
             ROOM_MAP.forEach(room => {
-                const regex = new RegExp(room.match.replace(/\s+/g, '\\s+'), 'gi');
-                let match; let foundPrices = [];
-                while ((match = regex.exec(cleanText)) !== null) {
-                    let chunk = cleanText.substring(match.index, match.index + 1200);
-                    
-                    const selectIdx = chunk.toLowerCase().indexOf("select");
-                    if (selectIdx !== -1) {
-                        chunk = chunk.substring(0, selectIdx);
-                    }
+                let foundPrices = [];
+                for (let matchStr of room.matches) {
+                    const regex = new RegExp(matchStr.replace(/\s+/g, '\\s+'), 'gi');
+                    let match;
+                    while ((match = regex.exec(cleanText)) !== null) {
+                        let chunk = cleanText.substring(match.index, match.index + 1200);
+                        // Strip out dropdown parenthesized prices to avoid multiplying total room prices
+                        chunk = chunk.replace(/\([^)]*\)/g, '');
 
-                    const priceMatches = [...chunk.matchAll(/THB\s*([\d,.]+)/gi)];
-                    priceMatches.forEach(p => {
-                        const val = cleanPrice(p[1]);
-                        if (!isNaN(val) && val > 0) {
-                            foundPrices.push(val);
-                        }
-                    });
+                        const priceMatches = [...chunk.matchAll(/(?:THB|฿)\s*([\d,.]+)/gi)];
+                        priceMatches.forEach(p => {
+                            const val = cleanPrice(p[1]);
+                            if (!isNaN(val) && val > 0) {
+                                foundPrices.push(val);
+                            }
+                        });
+                    }
+                    if (foundPrices.length > 0) break;
                 }
                 if (foundPrices.length > 0) quoteState[room.id] = Math.min(...foundPrices);
             });
