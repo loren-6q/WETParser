@@ -306,27 +306,33 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
         }
 
         function getConfirmDates() {
-            let bdc_in = "YYYY-MM-DD", bdc_out = "YYYY-MM-DD";
+            let wet_bdc_in = "YYYY-MM-DD", wet_bdc_out = "YYYY-MM-DD";
+            let swims_bdc_in = "YYYY-MM-DD", swims_bdc_out = "YYYY-MM-DD";
             let wet_hw_in = "YYYY-MM-DD", wet_hw_out = "YYYY-MM-DD";
             let swims_hw_in = "YYYY-MM-DD", swims_hw_out = "YYYY-MM-DD";
             
             if (volState.startDate && volState.endDate) {
                 const [sy, sm, sd] = volState.startDate.split('-').map(Number);
                 
-                const start = new Date(sy, sm - 1, sd, 12, 0, 0); 
+                const arrival = new Date(sy, sm - 1, sd, 12, 0, 0); 
 
-                const nextDay = new Date(start); nextDay.setDate(start.getDate() + 1);
-                const dayAfterNext = new Date(start); dayAfterNext.setDate(start.getDate() + 2);
+                const arrivalPlus1 = new Date(arrival); arrivalPlus1.setDate(arrival.getDate() + 1);
+                const arrivalPlus2 = new Date(arrival); arrivalPlus2.setDate(arrival.getDate() + 2);
 
-                bdc_in = getLocalDateString(start);
-                bdc_out = getLocalDateString(nextDay);
+                // WET BDC - Date of arrival
+                wet_bdc_in = getLocalDateString(arrival);
+                wet_bdc_out = getLocalDateString(arrivalPlus1);
+
+                // SWIMS BDC - Day after arrival
+                swims_bdc_in = getLocalDateString(arrivalPlus1);
+                swims_bdc_out = getLocalDateString(arrivalPlus2);
 
                 if (volState.noFullMoon) {
-                    wet_hw_in = bdc_in;
-                    wet_hw_out = bdc_out;
+                    wet_hw_in = wet_bdc_in;
+                    wet_hw_out = wet_bdc_out;
 
-                    swims_hw_in = getLocalDateString(nextDay);
-                    swims_hw_out = getLocalDateString(dayAfterNext);
+                    swims_hw_in = swims_bdc_in;
+                    swims_hw_out = swims_bdc_out;
                 } else {
                     let matchedShift = null;
                     let allShifts = [];
@@ -353,23 +359,33 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
                     if (matchedShift) {
                         const [my, mm, md] = matchedShift.split('-').map(Number);
+                        const partyStart = new Date(my, mm - 1, md, 12, 0, 0);
                         
-                        const wetHwInDate = new Date(my, mm - 1, md, 12, 0, 0);
+                        // Full Moon Party is 2 days after partyStart
+                        const fmpDate = new Date(partyStart);
+                        fmpDate.setDate(fmpDate.getDate() + 2);
+
+                        // WET HW - 2 days before Full Moon Party
+                        const wetHwInDate = new Date(fmpDate);
+                        wetHwInDate.setDate(fmpDate.getDate() - 2);
                         wet_hw_in = getLocalDateString(wetHwInDate);
+                        
                         const wetHwOutDate = new Date(wetHwInDate); 
                         wetHwOutDate.setDate(wetHwInDate.getDate() + 1);
                         wet_hw_out = getLocalDateString(wetHwOutDate);
 
-                        const swimsHwInDate = new Date(my, mm - 1, md, 12, 0, 0);
-                        swimsHwInDate.setDate(swimsHwInDate.getDate() - 1);
+                        // SWIMS HW - 1 week (7 days) before Full Moon Party
+                        const swimsHwInDate = new Date(fmpDate);
+                        swimsHwInDate.setDate(fmpDate.getDate() - 7);
                         swims_hw_in = getLocalDateString(swimsHwInDate);
+                        
                         const swimsHwOutDate = new Date(swimsHwInDate);
                         swimsHwOutDate.setDate(swimsHwInDate.getDate() + 1);
                         swims_hw_out = getLocalDateString(swimsHwOutDate);
                     }
                 }
             }
-            return { bdc_in, bdc_out, wet_hw_in, wet_hw_out, swims_hw_in, swims_hw_out };
+            return { wet_bdc_in, wet_bdc_out, swims_bdc_in, swims_bdc_out, wet_hw_in, wet_hw_out, swims_hw_in, swims_hw_out };
         }
 
         function getFmwDetails(checkin, checkout) {
@@ -497,9 +513,6 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
             renderResults();
         }
 
-        // ==========================================
-        // PARSING ENGINE (OTA + VOLUNTEER)
-        // ==========================================
         function handleInput() {
             const val = document.getElementById('input-area').value;
             if (!val.trim()) {
@@ -957,7 +970,7 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
             if (noFullMoon && !dateOverride && role !== 'art') {
                 const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
-                return `${hi} thanks for your request, but you've chosen dates that don't include a Full Moon Week period, which we can'output. If you are able to adjust your dates to include at least one of these periods, we can host you!\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
+                return `${hi} thanks for your request, but you've chosen dates that don't include a Full Moon Week period, which we can't accommodate. If you are able to adjust your dates to include at least one of these periods, we can host you!\n\n${DATE_EXPLAIN_HEADER}${getCalendarText('detailed')}\n\nJust in case, we'll send you full details of what we do and expect. If you feel you'd be a good fit, we'd be happy to host you! 😍\n\n${body}\n\n${BUMMER_FULL}\n\n${FOOTER_LINKS}`;
             }
 
             const body = (role === 'social') ? SOCIAL_TASKS_BODY : STANDARD_TASKS_BODY;
@@ -968,15 +981,15 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
 
         function generateVolConfirmResponse() {
             const { name, role, property, noFullMoon } = volState;
-            const { bdc_in, bdc_out, wet_hw_in, wet_hw_out, swims_hw_in, swims_hw_out } = getConfirmDates();
+            const { wet_bdc_in, wet_bdc_out, swims_bdc_in, swims_bdc_out, wet_hw_in, wet_hw_out, swims_hw_in, swims_hw_out } = getConfirmDates();
 
             const TRAVEL_CONFIRM = `----------\nTRAVEL\n----------\n🧳 Getting here is easy! We are a few minutes walk from Haad Rin Pier (boats come only from Samui), or you can get a shared taxi truck from Thongsala Pier (mainland ferries).\n\n✈ From Bangkok, Phuket, Krabi, Pattaya, Chiang Mai - You can fly to Koh Samui Airport but it's expensive. From the Samui airport, you can take a 100b taxi or shuttle to Big Buddha Pier and take the Haad Rin Queen ferry at 10.30am or 5pm for 200b, or speedboat at 3pm for 500b, straight to the right area of Phangan. (Other ferries are more expensive and arrive at Thongsala Pier over the mountain from Haad Rin, which will require a 150-200b shared taxi or 500b private taxi.) This option takes 2 to 3 hours if the timing is good.\n\n✈ From Bangkok, a cheaper flight option is to fly to Surat Thani (there's 1 flight from Chiang Mai to Surat too) or Nakon Si Thammarat Airport, where you can get a bus & ferry combo ticket to Phangan (see links below). Make sure you arrive by 3pm at the latest. This option takes 5-8 hours, depending on timing.\n\n⛴ Aside from flights, there are many options by bus, train, and ferry. The absolute cheapest is a 3rd-class day train to Surat Thani, but it's really rough. Bus/Train & Ferry options take about 14-18 hours.\n\nYou can book reliable travel here - https://12go.co/?z=7256550 - or to make it easier, we made direct links to common routes for Phangan:\n\n➡🏝 TRAVEL TO PHANGAN\n\n- From Koh Samui https://12go.asia/en/ferry/koh-samui/koh-phangan/?z=7256550&sub_id=KS-KP\n- From Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KT-KP\n- From Donsak https://12go.asia/en/ferry/donsak/koh-phangan/?z=7256550&sub_id=D-KP\n- From Surat Thani https://12go.asia/en/travel/surat-thani/koh-phangan/?z=7256550&sub_id=ST-KP\n- From Surat Thani Airport https://12go.asia/en/travel/surat-thani-airport/koh-phangan/?z=7256550&sub_id=URT-KP\n- From Bangkok https://12go.asia/en/travel/bangkok/koh-phangan/?z=7256550&sub_id=BKK-KP\n- From Phuket https://12go.asia/en/travel/phuket/koh-phangan/?z=7256550&sub_id=HKT-KP\n- From Krabi https://12go.asia/en/travel/krabi/koh-phangan/?z=7256550&sub_id=KBV-KP\n- From Koh Phi Phi https://12go.asia/en/travel/koh-phi-phi/koh-phangan/?z=7256550&sub_id=PP-KP\n- From Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=CM-KP\n\n🏝➡ TRAVEL FROM PHANGAN\n\n- To Koh Samui https://12go.asia/en/ferry/koh-phangan/koh-samui/?z=7256550&sub_id=KP-KS\n- To Koh Tao https://12go.asia/en/ferry/koh-phangan/koh-tao/?z=7256550&sub_id=KP-KT\n- To Donsak https://12go.asia/en/ferry/koh-phangan/donsak/?z=7256550&sub_id=KP-D\n- To Surat Thani https://12go.asia/en/travel/koh-phangan/surat-thani/?z=7256550&sub_id=KP-ST\n- To Surat Thani Airport https://12go.asia/en/travel/koh-phangan/surat-thani-airport/?z=7256550&sub_id=KP-URT\n- To Bangkok https://12go.asia/en/travel/koh-phangan/bangkok/?z=7256550&sub_id=KP-BKK\n- To Phuket https://12go.asia/en/travel/koh-phangan/phuket/?z=7256550&sub_id=KP-HKT\n- To Krabi https://12go.asia/en/travel/koh-phangan/krabi/?z=7256550&sub_id=KP-KBV\n- To Koh Phi Phi https://12go.asia/en/travel/koh-phangan/koh-phi-phi/?z=7256550&sub_id=KP-PP\n- To Chiang Mai https://12go.asia/en/travel/chiang-mai/koh-phangan/?z=7256550&sub_id=KP-CM\n\nWOW! Got it all! Let us know any questions, and sorry for this long and serious message. Once you arrive, we are very chill, fun, and easygoing, but we have to weed out the bad seeds first! 😂 We'll see you soon! 😍`;
 
             const isNoDeposit = (role === 'art' && noFullMoon) || (property === 'swims' && noFullMoon);
             
-            const wetBdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const wetBdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${wet_bdc_in}&checkout=${wet_bdc_out}&group_adults=1`;
             const wetHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${wet_hw_in}&to=${wet_hw_out}&guests=1`;
-            const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${swims_bdc_in}&checkout=${swims_bdc_out}&group_adults=1`;
             const swimsHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
 
             let confirmSteps = "";
@@ -996,13 +1009,13 @@ DECEMBER & NEW YEAR'S EVE (25Dec-4Jan) - 📍25Dec 🎉29Dec-2Jan 👋4Jan`;
         function generateVolFollowupResponse() {
             const { name, role, property, noFullMoon } = volState;
             const hi = name ? `Hi ${name},` : "Hi,";
-            const { bdc_in, bdc_out, wet_hw_in, wet_hw_out, swims_hw_in, swims_hw_out } = getConfirmDates();
+            const { wet_bdc_in, wet_bdc_out, swims_bdc_in, swims_bdc_out, wet_hw_in, wet_hw_out, swims_hw_in, swims_hw_out } = getConfirmDates();
 
             const isNoDeposit = (role === 'art' && noFullMoon) || (property === 'swims' && noFullMoon);
             
-            const wetBdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const wetBdcLink = `https://www.booking.com/hotel/th/wet-pool-party-haad-rin.html?checkin=${wet_bdc_in}&checkout=${wet_bdc_out}&group_adults=1`;
             const wetHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/WET-a-Pool-Party-Hostel-by-Wild-Wandering/Koh-Phangan/313418?from=${wet_hw_in}&to=${wet_hw_out}&guests=1`;
-            const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${bdc_in}&checkout=${bdc_out}&group_adults=1`;
+            const swimsBdcLink = `https://www.booking.com/hotel/th/swims-a-social-beach-resort.html?checkin=${swims_bdc_in}&checkout=${swims_bdc_out}&group_adults=1`;
             const swimsHwLink = `https://www.hostelworld.com/pwa/hosteldetails.php/SWIMS-a-Social-Beach-Resort/Koh-Phangan/339615?from=${swims_hw_in}&to=${swims_hw_out}&guests=1`;
 
             let confirmingBlock = "";
